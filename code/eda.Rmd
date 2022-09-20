@@ -7,16 +7,31 @@ output: pdf_document
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
+#Bioconductor packages
+library("annotate")
+library("biocLite")
+library("hgu133a2.db")
 ```
 
 \newpage
 
 \section{Introduction}
-The data providerd
-
+The aim of this project is to find links between certain gene expressions and familial Alzheimer's disease, using machine learning. To be more specific for the sake of data analysis: The mutation being observed is a presenilin 2 mutation, using patient-specific induced pluripotent stem cells (iPSC) to facilitate expression of the mutant type. Four different expression profiles were collected, using the Affymetrix Human Genome U133 Plus 2.0 Array. When looking at the names of columns, genes and differing values of expression, it's important to consider those are are all Affymetrix standards, which may need to be converted to further down the line. For example: Converting the gene IDs to ensembl IDs.
 \newpage   
 
-\section{Initial Data}
+\section{Initial Data & Variables}
+Let's first take a look at the provided .csv file, it's structure and first entries.
+
+```{r}
+raw.df = read.csv("../data/GSE28379.csv")
+head(raw.df, 5)
+```
+# ID_Ref.
+This column indicates the Affymetrix probe ID's. This is a result from the sequencing technique. These are probe ID's, which don't represent a lot by themselves. They can, however, be used to find the ensembl ID's and gene symbols, which will be attempted below with Bioconductor:
+
+```{r}
+
+```
 
 
 \newpage    
