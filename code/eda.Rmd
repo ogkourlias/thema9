@@ -9,8 +9,7 @@ output: pdf_document
 knitr::opts_chunk$set(echo = TRUE)
 #Bioconductor packages
 library("annotate")
-library("biocLite")
-library("hgu133a2.db")
+library("hgu133plus2.db")
 ```
 
 \newpage
@@ -27,11 +26,37 @@ raw.df = read.csv("../data/GSE28379.csv")
 head(raw.df, 5)
 ```
 # ID_Ref.
-This column indicates the Affymetrix probe ID's. This is a result from the sequencing technique. These are probe ID's, which don't represent a lot by themselves. They can, however, be used to find the ensembl ID's and gene symbols, which will be attempted below with Bioconductor:
+This column indicates the probe ID's, as sequenced by the  Affymetrix Human Genome U133 Plus 2.0 Array. This is athe result of the sequencing technique. These are probe ID's, which don't represent a lot by themselves. They can, however, be used to find the ensembl ID's and gene symbols, which will be attempted below with Bioconductor:
 
 ```{r}
-
+genes <- select(hgu133plus2.db, c(raw.df[,1]), c("SYMBOL","ENTREZID", "GENENAME"))
+na.list <- genes[is.na(genes$SYMBOL),] # Storing the genes which were not detected for whatever reason.
+colnames(genes)[1] <- "ID_REF" # Renaming  the column so the following merge works.
+main <- merge(raw.df, genes, by=c("ID_REF")) # Merging the two dataframes together into a new one.
+main <- main[!(main$ID_REF == "!series_matrix_table_end"),] # Removing an indicator row.
+head(main[,c(1,10,11,12)], 5)
 ```
+To summarize what has just been done: A bioconductor database was used to
+find the corresponding gene for every probe. It's important to note that for yet unknown reasons
+some probes were not recognized. The proper database was used, as can be seen by the database name.
 
+# GSM
+The GSM columns indicate the different samples used in the paper this data is derived from.
+The values under these columns represent sequencing concentration, which is the result of a normalisation algorithm called MAS5.0. This algorithm is also developed by Affymetrix. These values are also not log transformed. A dedicated column was made for that.
 
+The first two samples, GSM701542 and GSM701543 are iPSC sequences derived from Sparadic Parkinson's disease patients. The latter two, 
+GSM701544 and GSM701545 are iPSC sequences from familial Alzheimer's dis    ease (FAD) patients. The referenced paper aimed to compare
+the two conditions and their gene expressions.
+
+# No mutation & Mutation
+The first column, no mutation, signifies the average of the first two non mutated parkinson's samples.
+The second column, mutation, shows the average of the two FAD mutant type samples.
+
+# Log2 Fold Change
+These are subtracted 2log fold change values, showing which of the two averages are up regulated and down regulated.
+In case of a positive number, the mutation type samples are up regulated and the non-mutant types are down regulated.
+The reverse is true in case of a negative number.
+
+# Fold change
+The ratio between the mutation and no mutation values. Mutation being divided by no mutation in this case.
 \newpage    
