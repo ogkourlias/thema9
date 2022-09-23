@@ -1,8 +1,11 @@
 ---
-title: "Exploratory Data Analysis of "
+title: "Exploratory Data Analysis"
 author: "Orfeas Gkourlias"
 date: "`r Sys.Date()`"
-output: pdf_document
+output:
+  pdf_document: default
+  html_document:
+    df_print: paged
 ---
 
 ```{r setup, include=FALSE}
@@ -18,14 +21,14 @@ library("hgu133plus2.db")
 The aim of this project is to find links between certain gene expressions and familial Alzheimer's disease, using machine learning. To be more specific for the sake of data analysis: The mutation being observed is a presenilin 2 mutation, using patient-specific induced pluripotent stem cells (iPSC) to facilitate expression of the mutant type. Four different expression profiles were collected, using the Affymetrix Human Genome U133 Plus 2.0 Array. When looking at the names of columns, genes and differing values of expression, it's important to consider those are are all Affymetrix standards, which may need to be converted to further down the line. For example: Converting the gene IDs to ensembl IDs.
 \newpage   
 
-\section{Initial Data & Variables}
+\section{Initial Data and Variables}
 Let's first take a look at the provided .csv file, it's structure and first entries.
 
 ```{r}
 raw.df = read.csv("../data/GSE28379.csv")
 head(raw.df, 5)
 ```
-# ID_Ref.
+## ID_Ref.
 This column indicates the probe ID's, as sequenced by the  Affymetrix Human Genome U133 Plus 2.0 Array. This is athe result of the sequencing technique. These are probe ID's, which don't represent a lot by themselves. They can, however, be used to find the ensembl ID's and gene symbols, which will be attempted below with Bioconductor:
 
 ```{r}
@@ -40,7 +43,7 @@ To summarize what has just been done: A bioconductor database was used to
 find the corresponding gene for every probe. It's important to note that for yet unknown reasons
 some probes were not recognized. The proper database was used, as can be seen by the database name.
 
-# GSM
+## GSM
 The GSM columns indicate the different samples used in the paper this data is derived from.
 The values under these columns represent sequencing concentration, which is the result of a normalisation algorithm called MAS5.0. This algorithm is also developed by Affymetrix. These values are also not log transformed. A dedicated column was made for that.
 
@@ -48,15 +51,30 @@ The first two samples, GSM701542 and GSM701543 are iPSC sequences derived from S
 GSM701544 and GSM701545 are iPSC sequences from familial Alzheimer's dis    ease (FAD) patients. The referenced paper aimed to compare
 the two conditions and their gene expressions.
 
-# No mutation & Mutation
+## No mutation & Mutation
 The first column, no mutation, signifies the average of the first two non mutated parkinson's samples.
 The second column, mutation, shows the average of the two FAD mutant type samples.
 
-# Log2 Fold Change
+## Log2 Fold Change
 These are subtracted 2log fold change values, showing which of the two averages are up regulated and down regulated.
 In case of a positive number, the mutation type samples are up regulated and the non-mutant types are down regulated.
 The reverse is true in case of a negative number.
 
-# Fold change
+## Fold change
 The ratio between the mutation and no mutation values. Mutation being divided by no mutation in this case.
-\newpage    
+\newpage 
+
+# Data varaince
+The original paper aimed to compare two groups and their expressions. By looking at the calculated Log2FC data, it'll be possible to see how much the two groups differ. Let's first look at the most significant differently expressing genes.
+
+```{r}
+main <- main[order(main$log.2.fold.change),] # Reordering the DF by log2FC
+head(main[,c(10,6,7,8)], 10) #Showing the 10 most significant down regulated genes
+tail(main[,c(10,6,7,8)], 10) #Showing the 10 most significant up regulated genes
+```
+
+By taking a glance at the tables above, it seems that down regulation consits of more extreme values than up regulation. While this may be telling of how expression is affected by the mutation in general, it's not enough on it's own to draw any conclusions yet. Let's further explore the log2fc values by creating a boxplot.    
+
+```{r}
+boxplot(main$log.2.fold.change)
+```
