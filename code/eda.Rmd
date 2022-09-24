@@ -32,7 +32,7 @@ head(raw.df, 5)
 This column indicates the probe ID's, as sequenced by the  Affymetrix Human Genome U133 Plus 2.0 Array. This is athe result of the sequencing technique. These are probe ID's, which don't represent a lot by themselves. They can, however, be used to find the ensembl ID's and gene symbols, which will be attempted below with Bioconductor:
 
 ```{r}
-genes <- select(hgu133plus2.db, c(raw.df[,1]), c("SYMBOL","ENTREZID", "GENENAME"))
+genes <- select(hgu133plus2.db, c(raw.df[,1]), c("SYMBOL","ENTREZID", "GENENAME", "ONTOLOGY", "PATH"))
 na.list <- genes[is.na(genes$SYMBOL),] # Storing the genes which were not detected for whatever reason.
 colnames(genes)[1] <- "ID_REF" # Renaming  the column so the following merge works.
 main <- merge(raw.df, genes, by=c("ID_REF")) # Merging the two dataframes together into a new one.
@@ -64,7 +64,7 @@ The reverse is true in case of a negative number.
 The ratio between the mutation and no mutation values. Mutation being divided by no mutation in this case.
 \newpage 
 
-# Data varaince
+# Data variance
 The original paper aimed to compare two groups and their expressions. By looking at the calculated Log2FC data, it'll be possible to see how much the two groups differ. Let's first look at the most significant differently expressing genes.
 
 ```{r}
@@ -72,9 +72,51 @@ main <- main[order(main$log.2.fold.change),] # Reordering the DF by log2FC
 head(main[,c(10,6,7,8)], 10) #Showing the 10 most significant down regulated genes
 tail(main[,c(10,6,7,8)], 10) #Showing the 10 most significant up regulated genes
 ```
-
-By taking a glance at the tables above, it seems that down regulation consits of more extreme values than up regulation. While this may be telling of how expression is affected by the mutation in general, it's not enough on it's own to draw any conclusions yet. Let's further explore the log2fc values by creating a boxplot.    
+\newpage
+By taking a glance at the tables above, it seems that down regulation consists of more extreme values than up regulation. While this may be telling of how expression is affected by the mutation in general, it's not enough on its own to draw any conclusions yet. Let's further explore the log2fc values by creating a boxplot.     
 
 ```{r}
-boxplot(main$log.2.fold.change)
+boxplot(main$log.2.fold.change, horizontal = TRUE, xlab = "Log2FC", title = "Boxplot of Log2FC")
 ```
+
+As can be seen from the boxplot, there appears to be great variance in the log2FC values.
+This may be further examined by looking at a summary.
+
+```{r}
+summary(main$log.2.fold.change)
+```
+Judging by the boxplot and summary table, the genes seem to be mostly down regulated.
+
+# Relations
+Since the data provided is that of solely DEG's, there will not be any variables
+that affect each other, besides the obvious calculation of fold changes and means.
+That being said: There could be a connection between up/down regulation of certain
+genetic regions. Taking RPS4Y1, a gene encoding for a ribosomal sub unit,
+as an example: Could there be a trend in the mutation affecting down/up regulation
+of specifically ribosomal genes? Questions like these are not suited for EDA, but 
+the addition of gene symbols, KEGG pathway, ontology and entrezID's columns in this document 
+will help in answering such questions, which will eventually mean answering the research question.
+
+Plotting the different KEGG IDs and ontological vlsddrd can however offer insight into
+which pathways and classes are most prevelant.
+
+```{r}
+barplot(table(main$ONTOLOGY), xlab = "Ontological Class", ylab = "Occurences")
+```
+The differing classes appear to be close in the amount of occurrences. It may be
+possible to find a relationship when looking at the Log2FC values for every different class.
+
+```{r}
+BP <- subset(main, ONTOLOGY == "BP")
+CC <- subset(main, ONTOLOGY == "CC")
+MF <- subset(main, ONTOLOGY == "MF")
+
+summary(BP$log.2.fold.change)
+summary(CC$log.2.fold.change)
+summary(MF$log.2.fold.change)
+
+boxplot(BP$log.2.fold.change, CC$log.2.fold.change, MF$log.2.fold.change)
+```
+Both the summaries and boxplots are very similar for every clasification.
+At first glance this indicates that the classes are not a detriment in
+the fold change values of genes.
