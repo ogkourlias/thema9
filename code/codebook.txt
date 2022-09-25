@@ -1,0 +1,10 @@
+column;description
+ID_REF;Probe ID
+GSM701543;Parkinson's sample 1 RNA Concentration
+GSM701543;Parkinson's sample 2 RNA Concentration
+GSM701544;Alzheimer's sample 1 RNA Concentration
+GSM701545;Alzheimer's sample 2 RNA Concentration
+no.mutation;Means of Parkinson's RNA Concentration
+mutation;Means of Parkinson's RNA Concentration
+log.2.fold.change;Log2 Fold Change Values between mutation and no.mutation
+fold.change;Fold Change Values between mutation and no.mutation

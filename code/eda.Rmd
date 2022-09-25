@@ -1,5 +1,5 @@
 ---
-title: "Exploratory Data Analysis"
+title: "Exploratory Data Analysis: Which genes and their expression levels may be associated with developing familial alzheimer's disease?"
 author: "Orfeas Gkourlias"
 date: "`r Sys.Date()`"
 output:
@@ -13,8 +13,18 @@ knitr::opts_chunk$set(echo = TRUE)
 #Bioconductor packages
 library("annotate")
 library("hgu133plus2.db")
+library("readr")
 ```
 
+\newpage
+# Codebook
+```{r}
+codebook <- read_delim(file = "codebook.txt",
+                       delim = ";",
+                       show_col_types=FALSE)
+
+knitr::kable(codebook)
+```
 \newpage
 
 \section{Introduction}
@@ -48,7 +58,7 @@ The GSM columns indicate the different samples used in the paper this data is de
 The values under these columns represent sequencing concentration, which is the result of a normalisation algorithm called MAS5.0. This algorithm is also developed by Affymetrix. These values are also not log transformed. A dedicated column was made for that.
 
 The first two samples, GSM701542 and GSM701543 are iPSC sequences derived from Sparadic Parkinson's disease patients. The latter two, 
-GSM701544 and GSM701545 are iPSC sequences from familial Alzheimer's dis    ease (FAD) patients. The referenced paper aimed to compare
+GSM701544 and GSM701545 are iPSC sequences from familial Alzheimer's disease (FAD) patients. The referenced paper aimed to compare
 the two conditions and their gene expressions.
 
 ## No mutation & Mutation
@@ -64,7 +74,7 @@ The reverse is true in case of a negative number.
 The ratio between the mutation and no mutation values. Mutation being divided by no mutation in this case.
 \newpage 
 
-# Data variance
+# Data variance & spread.
 The original paper aimed to compare two groups and their expressions. By looking at the calculated Log2FC data, it'll be possible to see how much the two groups differ. Let's first look at the most significant differently expressing genes.
 
 ```{r}
@@ -81,14 +91,33 @@ boxplot(main$log.2.fold.change, horizontal = TRUE, xlab = "Log2FC", title = "Box
 
 As can be seen from the boxplot, there appears to be great variance in the log2FC values.
 This may be further examined by looking at a summary.
-
 ```{r}
 summary(main$log.2.fold.change)
 ```
-Judging by the boxplot and summary table, the genes seem to be mostly down regulated.
+\newpage
 
-# Relations
-Since the data provided is that of solely DEG's, there will not be any variables
+Judging by the box plot and summary table, the genes seem to be mostly down regulated.
+
+To further look at the distribution of the  data, a density plot can also be used.
+
+```{r, fig.width=8, fig.height=5}
+plot(density(main$log.2.fold.change), main = "Log2FC distribution", xlab = "Log2FC")
+```
+Judging by the box plots and density plot, the data seems to be roughly normally distributed.
+This is useful when looking at statistical significance in analyzing correlations.
+The lower and higher tail end genes will be stored for these ends.
+
+```{r}
+high <- main[pnorm(main$log.2.fold.change, mean = mean(main$log.2.fold.change),
+                   sd = sd(main$log.2.fold.change)) >= 0.975,]
+low <- main[pnorm(main$log.2.fold.change, mean = mean(main$log.2.fold.change),
+                  sd = sd(main$log.2.fold.change)) <= 0.025,]
+```
+
+\newpage
+
+# Correlations
+Since the data in the file are all individual reads, there will not be any variables
 that affect each other, besides the obvious calculation of fold changes and means.
 That being said: There could be a connection between up/down regulation of certain
 genetic regions. Taking RPS4Y1, a gene encoding for a ribosomal sub unit,
@@ -97,14 +126,27 @@ of specifically ribosomal genes? Questions like these are not suited for EDA, bu
 the addition of gene symbols, KEGG pathway, ontology and entrezID's columns in this document 
 will help in answering such questions, which will eventually mean answering the research question.
 
-Plotting the different KEGG IDs and ontological vlsddrd can however offer insight into
-which pathways and classes are most prevelant.
+Plotting the different KEGG IDs and ontological classifications can however offer insight into
+which pathways and classes are most prevalent.
 
 ```{r}
 barplot(table(main$ONTOLOGY), xlab = "Ontological Class", ylab = "Occurences")
 ```
-The differing classes appear to be close in the amount of occurrences. It may be
-possible to find a relationship when looking at the Log2FC values for every different class.
+The differing classes appear to be close in the amount of occurrences. Looking at
+the values in the lower and upper 2.5%  may net different results.
+
+\newpage
+
+```{r}
+barplot(table(high$ONTOLOGY), xlab = "Ontological Class", ylab = "Occurences", main ="Upper-tail")
+barplot(table(low$ONTOLOGY), xlab = "Ontological Class", ylab = "Occurences", main ="Lower-tail")
+```
+The bar plots show that the lower-end and upper-end tails are also equally divided.
+
+\newpage
+
+It may be possible to find distinctions between different classes by looking at 
+the Log2FC values for every different class.
 
 ```{r}
 BP <- subset(main, ONTOLOGY == "BP")
@@ -115,8 +157,44 @@ summary(BP$log.2.fold.change)
 summary(CC$log.2.fold.change)
 summary(MF$log.2.fold.change)
 
-boxplot(BP$log.2.fold.change, CC$log.2.fold.change, MF$log.2.fold.change)
+boxplot(BP$log.2.fold.change, CC$log.2.fold.change, MF$log.2.fold.change,
+        names = c("BP", "CC", "MF"), ylab = "Log2FC")
 ```
-Both the summaries and boxplots are very similar for every clasification.
+Both the summaries and box plots are very similar for every classification.
 At first glance this indicates that the classes are not a detriment in
 the fold change values of genes.
+
+To confirm this suspicion, t-test may be performed. Since multiple
+groups are being observed, an ANOVA test may be used.
+```{r}
+summary(aov(main$log.2.fold.change~main$ONTOLOGY))
+```
+As can be seen from the results, the P-Value indicates that there's no significant
+difference in Log2FC means of ontological classes.
+
+The same may be done for the pathways. The pathway column does have significantly more
+unique occurrences than the ontological classifications. The ones with the most significant
+log2FC values will therefore be shown and considered.
+
+```{r}
+occur_path_high <- table(high$PATH)
+occur_path_high <- occur_path_high[order(occur_path_high, decreasing = TRUE)]
+occur_path_high[1:10] # list is around 160 diferent pathway entries long. 
+#Showing the 10 most prevelant ones at the higher end.
+
+occur_path_low <- table(low$PATH)
+occur_path_low <- occur_path_low[order(occur_path_low, decreasing = TRUE)]
+occur_path_low[1:10] # list is around 160 diferent pathway entries long. 
+#Showing the 10 most prevelant ones at the lower end.
+```
+\newpage
+
+# Summary
+The initial data offers insight into the differing expression values of genes between
+a mutant and non-mutant group. By examining the variables and columns provided,
+multiple facets of the data was analysed. First, there seems to be a great spread in the data
+when looking at log2FC values. The data is also normally distributed. 
+To find correlations between the variables, notably log2FC and different identifiers,
+the most significant DEGs were extracted. Analysis of these genes and their complimentary
+KEGG pathways and ontological identifiers was performed. No significant correlations were
+found by looking at those two variables and examining the corresponding log2FC values.
