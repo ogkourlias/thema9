@@ -1,0 +1,98 @@
+---
+title: "Results and Discussion & Conlcusion"
+output: pdf_document
+date: "`r Sys.Date()`"
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library("annotate")
+library("hgu133plus2.db")
+library("readr")
+raw.df = read.csv("../data/GSE28379.csv")
+genes <- select(hgu133plus2.db, c(raw.df[,1]), c("SYMBOL","ENTREZID", "GENENAME"))
+na.list <- genes[is.na(genes$SYMBOL),] # Storing the genes which were not detected for whatever reason.
+colnames(genes)[1] <- "ID_REF" # Renaming  the column so the following merge works.
+main <- merge(raw.df, genes, by=c("ID_REF")) # Merging the two dataframes together into a new one.
+main <- main[!(main$ID_REF == "!series_matrix_table_end"),] # Removing an indicator row.
+main <- main[order(main$log.2.fold.change),] # Reordering the DF by log2FC
+high <- main[pnorm(main$log.2.fold.change, mean = mean(main$log.2.fold.change),
+                   sd = sd(main$log.2.fold.change)) >= 0.975,]
+low <- main[pnorm(main$log.2.fold.change, mean = mean(main$log.2.fold.change),
+                  sd = sd(main$log.2.fold.change)) <= 0.025,]
+high <- high[order(high$log.2.fold.change, decreasing  = TRUE),]
+low <- low[order(low$log.2.fold.change),]
+```
+
+## Results
+Following the conclusion of exploratory data analysis, multiple important 
+observations can be made about the data set. These will be examined by order
+of importance to answering the research question.
+
+Starting with the significant fold change values.
+
+```{r echo=F}
+head(high[,c(8,10)], 10)
+head(low[,c(8,10)], 10)
+```
+These are the 10 most significant genes, for both the higher and lower ends. There
+is a total of 57182 probe reads in the initial dataset. Using the pnorm function
+within R, the genes with Log2FC values on both ends were extracted. The higher
+end consisting of the upper 2.5% of the distribution, which totals 1761 of the 
+57182 genes. The lower 2.5% consists of 1945 genes. These two numbers are close,
+reinforcing the conclusion made in  the EDA that the data is normally distributed.
+The higher the value, the more up-regulated the gene is in the mutant samples.
+The lower values are therefore indicators of down-regulation in the mutant samples.
+
+\newpage
+A comparison between the two groups may be made. The following box plots display
+summaries of both ends.
+
+```{r echo=F}
+boxplot(high$log.2.fold.change, main = "Log2FC Up-Regulation values")
+boxplot(low$log.2.fold.change, main = "Log2FC Down-Regulation values")
+```
+The boxplot shows the usual summary values. It is noteworthy that there are
+extreme values in both instances. 6 Of the up-regulated values being higher
+than the others in the plot. The same can be seen in the down-regulation plot,
+but with 7 values.
+
+```{r echo=F}
+d_high <- density(high$log.2.fold.change)
+d_low <- density(low$log.2.fold.change)
+plot(d_high, main="Density of Up-Regulation", xlab = "Log2FC")
+plot(d_low, main="Density of Down-Regulation", xlab = "Log2FC")
+```
+
+Density plots also indicate that the down-regulation is on average of bigger effect
+than up-regulation. In addition to plotting, this can also be demonstrated with a
+numerical summary
+
+```{r echo=F}
+print("test")
+summary(high$log.2.fold.change)
+print("test")
+summary(low$log.2.fold.change)
+```
+As can be seen, the down-regulation has a more extreme mean than that of the
+up-regulation.
+
+## Discussion & Conclusion
+The examination of the data and plots shows that the mutation indeed affects
+several genes. Both in being up and down regulated, with a slight bias towards
+down regulation. In answering the research question, there needs to be
+a correlation between genes and the development of FAD. This correlation seems
+to be present, considering the mutation levels across the three mutation samples
+are similar. This may further be researched with addition of other control groups,
+and more FAD patient samples.
+
+Which genes are correlated to FAD can also be deduced from the data. There's hundreds
+of genes which are expressed significantly different in the mutant samples.
+While all of these are important, there's still extremes with an alpha value of
+0.05. These extreme down-regulated genes are, in order of significance:
+RPS4Y1, DDX3Y, EIF1AY, ZNF257, EIF1AY, HRK and TXLNGY. For up-regulation these are:
+BMP5, CASP1, MMP1, ITGB6, LINC02478, CD69.
+
+Looking at the individual genes and their transcripts may point to proteins
+which would make sense for FAD patients to be functioning differently.
+Looking at RPS4Y1:
