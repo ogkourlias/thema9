@@ -95,4 +95,31 @@ BMP5, CASP1, MMP1, ITGB6, LINC02478, CD69.
 
 Looking at the individual genes and their transcripts may point to proteins
 which would make sense for FAD patients to be functioning differently.
-Looking at RPS4Y1:
+Looking at RPS4Y1: a gene encoding for  ribosomal protein S4. This specific gene,
+and more related to ribosome components, have been observed to be differentialy expressed in
+multiple forms of Alzheimers, not just FAD. https://www.sciencedirect.com/science/article/pii/S0197458006004349?via%3Dihub
+There's more DEG's which affect the transcriptional capabilities of patients. These have
+also been discovered in prior studies. DDX3Y is related to translatoin.
+EIF1AY and ZNF257 are both genes encoding for transcription components, 
+just like RPS4Y1. (another paper on transcriptional componontent mutation in AD): https://alzres.biomedcentral.com/articles/10.1186/s13195-020-00654-x
+
+The two other up-regulated genes are neither related to the cental dogma of cells.
+HRK encodes for a gene related to activation and inhibition of apoptosis. This has also been observed
+in prior papers on AD genetics as a possibly important gene for AD ( Hippocampus ). (https://www.ncbi.nlm.nih.gov/pmc/articles/PMC6179157/)
+
+
+TXLNGY seems to be a gene detrimental to syntaxin binding activity. This gene seems to be
+differentially expressed in AD patients with choroid plexus epithelium failure.
+https://www.ncbi.nlm.nih.gov/pmc/articles/PMC4647590/
+
+In the case of down regulation, the BMP5 gene has the lowest log2FC value. This gene
+encodes for a protein which is part of developing cartilige and bones. The literature on
+this specific gene is quite limited. Cartilige and bone development intuitively does not
+allude to any involvement with development of Alzhimer's disease.
+
+CASP1 is a gene that encodes for an enzyme which mediates the cleavage of the inactive precursor of IL-1β.
+The literature on the link between this and familial alzheimers disease is a topic of debate. This paper (https://www.ncbi.nlm.nih.gov/pmc/articles/PMC2837022/) seems to acknowledge the differential expression of this gene,
+but does not accept the association with Alzheimer's disease.
+
+
+
