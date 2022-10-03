@@ -16,6 +16,8 @@ colnames(genes)[1] <- "ID_REF" # Renaming  the column so the following merge wor
 main <- merge(raw.df, genes, by=c("ID_REF")) # Merging the two dataframes together into a new one.
 main <- main[!(main$ID_REF == "!series_matrix_table_end"),] # Removing an indicator row.
 main <- main[order(main$log.2.fold.change),] # Reordering the DF by log2FC
+main$path <- mapIds(hgu133plus2.db, c(main[,11]), c("PATH"), keytype = "ENTREZID")
+main$go <- mapIds(hgu133plus2.db, c(main[,11]), c("ONTOLOGY"), keytype = "ENTREZID")
 high <- main[pnorm(main$log.2.fold.change, mean = mean(main$log.2.fold.change),
                    sd = sd(main$log.2.fold.change)) >= 0.975,]
 low <- main[pnorm(main$log.2.fold.change, mean = mean(main$log.2.fold.change),
@@ -41,46 +43,88 @@ within R, the genes with Log2FC values on both ends were extracted. The higher
 end consisting of the upper 2.5% of the distribution, which totals 1761 of the 
 57182 genes. The lower 2.5% consists of 1945 genes. These two numbers are close,
 reinforcing the conclusion made in  the EDA that the data is normally distributed.
-The higher the value, the more up-regulated the gene is in the mutant samples.
-The lower values are therefore indicators of down-regulation in the mutant samples.
+The higher the value, the more upregulated the gene is in the mutant samples.
+The lower values are therefore indicators of downregulation in the mutant samples.
 
 \newpage
 A comparison between the two groups may be made. The following box plots display
 summaries of both ends.
 
 ```{r echo=F}
-boxplot(high$log.2.fold.change, main = "Log2FC Up-Regulation values")
-boxplot(low$log.2.fold.change, main = "Log2FC Down-Regulation values")
+boxplot(high$log.2.fold.change, main = "Log2FC Upregulated values")
+boxplot(low$log.2.fold.change, main = "Log2FC Downregulated values")
 ```
 The boxplot shows the usual summary values. It is noteworthy that there are
-extreme values in both instances. 6 Of the up-regulated values being higher
-than the others in the plot. The same can be seen in the down-regulation plot,
+extreme values in both instances. 6 Of the upregulated values being higher
+than the others in the plot. The same can be seen in the downregulation plot,
 but with 7 values.
 
-```{r echo=F}
+\newpage
+
+```{r echo=F, fig.height=4}
 d_high <- density(high$log.2.fold.change)
 d_low <- density(low$log.2.fold.change)
-plot(d_high, main="Density of Up-Regulation", xlab = "Log2FC")
-plot(d_low, main="Density of Down-Regulation", xlab = "Log2FC")
+plot(d_high, main="Density of Upregulation", xlab = "Log2FC")
+plot(d_low, main="Density of Downregulation", xlab = "Log2FC")
 ```
 
-Density plots also indicate that the down-regulation is on average of bigger effect
-than up-regulation. In addition to plotting, this can also be demonstrated with a
+Density plots also indicate that the downregulation is on average of bigger effect
+than upregulation. 
+
+\newpage
+The results show above can also be demonstrated with a
 numerical summary
 
 ```{r echo=F}
-print("test")
-summary(high$log.2.fold.change)
-print("test")
-summary(low$log.2.fold.change)
+print(summary(high$log.2.fold.change))
+print(summary(low$log.2.fold.change))
 ```
-As can be seen, the down-regulation has a more extreme mean than that of the
-up-regulation.
+As can be seen, the downregulation has a more extreme mean than that of the
+upregulation.
+
+\newpage
+
+In addition to the individual genes, ontological classes
+were analysed. The following spread in ontological classes was observed.
+
+```{r echo=F}
+BP <- subset(main, go == "BP")
+CC <- subset(main, go == "CC")
+MF <- subset(main, go == "MF")
+
+boxplot(BP$log.2.fold.change, CC$log.2.fold.change, MF$log.2.fold.change,
+        names = c("BP", "CC", "MF"), ylab = "Log2FC", main = "Log2FC by GO class.")
+```
+
+This shows that the Log2FC spread differs for the classes. They do retain roughtly
+the same averages, but have different lower and higher ends.
+
+\newpage
+This may also be observed for the significant DEGs.
+
+```{r echo=F, fig.height=4}
+BP_high <- subset(high, go == "BP")
+CC_high <- subset(high, go == "CC")
+MF_high <- subset(high, go == "MF")
+
+BP_low <- subset(low, go == "BP")
+CC_low <- subset(low, go == "CC")
+MF_low <- subset(low, go == "MF")
+
+boxplot(BP_high$log.2.fold.change, CC_high$log.2.fold.change, MF_high$log.2.fold.change,
+        names = c("BP", "CC", "MF"), ylab = "Log2FC", main = "Log2FC in top 2.5% by GO class.")
+
+boxplot(BP_low$log.2.fold.change, CC_low$log.2.fold.change, MF_low$log.2.fold.change,
+        names = c("BP", "CC", "MF"), ylab = "Log2FC", main = "Log2FC in bottom 2.5% by GO class.")
+```
+
+
+\newpage
 
 ## Discussion & Conclusion
 The examination of the data and plots shows that the mutation indeed affects
 several genes. Both in being up and down regulated, with a slight bias towards
-down regulation. In answering the research question, there needs to be
+downregulation. In answering the research question, there needs to be
 a correlation between genes and the development of FAD. This correlation seems
 to be present, considering the mutation levels across the three mutation samples
 are similar. This may further be researched with addition of other control groups,
@@ -89,52 +133,62 @@ and more FAD patient samples.
 Which genes are correlated to FAD can also be deduced from the data. There's hundreds
 of genes which are expressed significantly different in the mutant samples.
 While all of these are important, there's still extremes with an alpha value of
-0.05. These extreme down-regulated genes are, in order of significance:
-RPS4Y1, DDX3Y, EIF1AY, ZNF257, EIF1AY, HRK and TXLNGY. For up-regulation these are:
+0.05. These extreme downregulated genes are, in order of significance:
+RPS4Y1, DDX3Y, EIF1AY, ZNF257, EIF1AY, HRK and TXLNGY. For upregulation these are:
 BMP5, CASP1, MMP1, ITGB6, LINC02478, CD69.
 
+### Upregulation
 Looking at the individual genes and their transcripts may point to proteins
 which would make sense for FAD patients to be functioning differently.
 Looking at RPS4Y1: a gene encoding for  ribosomal protein S4. This specific gene,
-and more related to ribosome components, have been observed to be differentialy expressed in
-multiple forms of Alzheimers, not just FAD. https://www.sciencedirect.com/science/article/pii/S0197458006004349?via%3Dihub
-There's more DEG's which affect the transcriptional capabilities of patients. These have
-also been discovered in prior studies. DDX3Y is related to translatoin.
+and more related to ribosome components, have been observed to be differentially expressed in
+multiple forms of Alzheimer's disease, not merely familial Alzheimer's disease. 
+[Translational gene mapping of cognitive decline](https://www.sciencedirect.com/science/article/pii/S0197458006004349?via%3Dihub)
+
+There's more relevant DEGs which affect the transcriptional capabilities of patients. These have
+also been discovered in prior papers. DDX3Y is related to translation.
 EIF1AY and ZNF257 are both genes encoding for transcription components, 
-just like RPS4Y1. (another paper on transcriptional componontent mutation in AD): https://alzres.biomedcentral.com/articles/10.1186/s13195-020-00654-x
+just like RPS4Y1.[Identification of potential blood biomarkers for early diagnosis of Alzheimer’s disease through RNA sequencing analysis](https://alzres.biomedcentral.com/articles/10.1186/s13195-020-00654-x)
 
-The two other up-regulated genes are neither related to the cental dogma of cells.
+The two remaining upregulated genes are neither related to the central dogma of cells.
 HRK encodes for a gene related to activation and inhibition of apoptosis. This has also been observed
-in prior papers on AD genetics as a possibly important gene for AD ( Hippocampus ). (https://www.ncbi.nlm.nih.gov/pmc/articles/PMC6179157/)
+in a prior paper on AD genetics as a possibly important gene for AD. The hippocampus being mainly affected.
+[Genomic Variants, Genes, and Pathways of Alzheimer’s Disease: An Overview](https://www.ncbi.nlm.nih.gov/pmc/articles/PMC6179157/)
 
+TXLNGY is a gene detrimental to syntaxin binding activity. This gene appears to be
+differentially expressed in AD patients who experience choroid plexus epithelium failure.
+[Gene expression and functional annotation of human choroid plexus epithelium failure in Alzheimer’s disease](https://www.ncbi.nlm.nih.gov/pmc/articles/PMC4647590/)
 
-TXLNGY seems to be a gene detrimental to syntaxin binding activity. This gene seems to be
-differentially expressed in AD patients with choroid plexus epithelium failure.
-https://www.ncbi.nlm.nih.gov/pmc/articles/PMC4647590/
+### Downregulation
+In the case of downregulation, the BMP5 gene has the lowest log2FC value. This gene
+encodes for a protein which is part of developing cartilage and bones. The literature on
+this specific gene is quite limited. Cartilage and bone development intuitively does not
+allude to any involvement with development of Alzheimer's disease.
 
-In the case of down regulation, the BMP5 gene has the lowest log2FC value. This gene
-encodes for a protein which is part of developing cartilige and bones. The literature on
-this specific gene is quite limited. Cartilige and bone development intuitively does not
-allude to any involvement with development of Alzhimer's disease.
+CASP1 is a gene that encodes for an enzyme which mediates the cleavage of the inactive precursor of IL-1beta.
+The literature on the link between this and familial Alzheimer's disease is a topic of debate. This paper:  
+[Caspase-1 genetic variation is not associated with Alzheimer's disease risk](https://www.ncbi.nlm.nih.gov/pmc/articles/PMC2837022/)
+seems to acknowledge the differential expression correlation of this gene,
+but does not accept the causative association with Alzheimer's disease.
 
-CASP1 is a gene that encodes for an enzyme which mediates the cleavage of the inactive precursor of IL-1β.
-The literature on the link between this and familial alzheimers disease is a topic of debate. This paper (https://www.ncbi.nlm.nih.gov/pmc/articles/PMC2837022/) seems to acknowledge the differential expression of this gene,
-but does not accept the association with Alzheimer's disease.
+MMP1 encodes for a metalloproteinase enzyme, which can cause tissue breakdown and secondary damage by several diseases.
+According to this paper: [Brain matrix metalloproteinase 1 levels are elevated in Alzheimer's disease](https://pubmed.ncbi.nlm.nih.gov/10984641/), there might be a link with increased MMP1 levels and AD.
+The keyword being elevated. This DEG data set indicates that the gene is down regulated in case of FAD. 
+This is a surprising result, considering the referenced paper shows the opposite. 
 
-MMP1, ITGB6, LINC02478, CD69.
+The literature on the link between [ITGB6] and FAD is limited, but the differential expression of this gene
+is a recurring observation. The protein for which the gene encodes is an integrin.
 
-MMP1 encodes for a metalloproteinase enyzme, which can cause tissue breakdown and secondary damage in diseases. According to this paper, there might be a link with incresaed MMP1 levels and AD. The keyword being elevated. This DEG dataset indicates that the gene is transcribed less in FAD. This is a surprising result, considering what the paper shows.https://pubmed.ncbi.nlm.nih.gov/10984641/
+LINC02478 is a bit of a different gene to the others. This is a long intergenic non-coding rna gene. This might be cause for further analysis, because this gene lacks sufficient research to make any yet conclusions.
 
-The literatuer on the link between ITGB6 and FAD is limited, but the differential expression of this gene isa recurring osbervation. The protein for which the gene encodes is an integrin.
+The last gene, CD69, encodes for a membrane-bound, type 2 C-lectin receptor.
+The paper: [Elevation of CD69+ monocyte/macrophages in patients with Alzheimer's disease](https://pubmed.ncbi.nlm.nih.gov/10879686/)
+Indicates that this is indeed a relevant DEG. But just like MMP1, there's a difference in up/down regultaion between the data
+in the referenced paper, and the data set used in this one. While the reference shows
+that there is a link between upregulation and AD, the data from this project shows
+downregulation.
 
-LINC02478 is a bit of a different gene to the others. This is a long intergenic non-coding rna gene. This might be cause for further analysis, because this gene lacks sufficient research to make any conclusions.
-
-The last gene, CD69, encodes for a membrane-bound, type 2 c-lectin receptor.
-https://pubmed.ncbi.nlm.nih.gov/10879686/ Indicates that this is indeed a relevant
-DEG. But just like MMP1, there's a difference in up/down regultaion between the data
-in the referenced paper, and the dataset used in this one. While the reference shows
-that theres a link between up-regulation and AD, the data in this project shows
-down-regulation.
-
-It is not clear why the genes in this project seem to have opposing regulation trends
-with the data seen in other papers.
+It is not clear why some of the genes in this project seem to have opposing regulation
+trends with the data seen in other papers. This might be because both up and down
+regulation of these genes are pathogenic, and may lead to the loss of function in proteins.
+Which would explain the phenomenon.
