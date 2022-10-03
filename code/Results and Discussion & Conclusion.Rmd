@@ -121,5 +121,20 @@ CASP1 is a gene that encodes for an enzyme which mediates the cleavage of the in
 The literature on the link between this and familial alzheimers disease is a topic of debate. This paper (https://www.ncbi.nlm.nih.gov/pmc/articles/PMC2837022/) seems to acknowledge the differential expression of this gene,
 but does not accept the association with Alzheimer's disease.
 
+MMP1, ITGB6, LINC02478, CD69.
 
+MMP1 encodes for a metalloproteinase enyzme, which can cause tissue breakdown and secondary damage in diseases. According to this paper, there might be a link with incresaed MMP1 levels and AD. The keyword being elevated. This DEG dataset indicates that the gene is transcribed less in FAD. This is a surprising result, considering what the paper shows.https://pubmed.ncbi.nlm.nih.gov/10984641/
 
+The literatuer on the link between ITGB6 and FAD is limited, but the differential expression of this gene isa recurring osbervation. The protein for which the gene encodes is an integrin.
+
+LINC02478 is a bit of a different gene to the others. This is a long intergenic non-coding rna gene. This might be cause for further analysis, because this gene lacks sufficient research to make any conclusions.
+
+The last gene, CD69, encodes for a membrane-bound, type 2 c-lectin receptor.
+https://pubmed.ncbi.nlm.nih.gov/10879686/ Indicates that this is indeed a relevant
+DEG. But just like MMP1, there's a difference in up/down regultaion between the data
+in the referenced paper, and the dataset used in this one. While the reference shows
+that theres a link between up-regulation and AD, the data in this project shows
+down-regulation.
+
+It is not clear why the genes in this project seem to have opposing regulation trends
+with the data seen in other papers.
