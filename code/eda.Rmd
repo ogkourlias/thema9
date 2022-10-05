@@ -14,6 +14,7 @@ knitr::opts_chunk$set(echo = TRUE)
 library("annotate")
 library("hgu133plus2.db")
 library("readr")
+library("tidyr")
 ```
 
 \newpage
@@ -42,11 +43,13 @@ head(raw.df, 5)
 This column indicates the probe ID's, as sequenced by the  Affymetrix Human Genome U133 Plus 2.0 Array. This is athe result of the sequencing technique. These are probe ID's, which don't represent a lot by themselves. They can, however, be used to find the ensembl ID's and gene symbols, which will be attempted below with Bioconductor:
 
 ```{r}
-genes <- select(hgu133plus2.db, c(raw.df[,1]), c("SYMBOL","ENTREZID", "GENENAME", "ONTOLOGY", "PATH"))
+genes <- select(hgu133plus2.db, c(raw.df[,1]), c("SYMBOL","ENTREZID", "GENENAME"))
 na.list <- genes[is.na(genes$SYMBOL),] # Storing the genes which were not detected for whatever reason.
 colnames(genes)[1] <- "ID_REF" # Renaming  the column so the following merge works.
 main <- merge(raw.df, genes, by=c("ID_REF")) # Merging the two dataframes together into a new one.
 main <- main[!(main$ID_REF == "!series_matrix_table_end"),] # Removing an indicator row.
+main$path <- mapIds(hgu133plus2.db, c(main[,11]), c("PATH"), keytype = "ENTREZID")
+main$go <- mapIds(hgu133plus2.db, c(main[,11]), c("ONTOLOGY"), keytype = "ENTREZID")
 head(main[,c(1,10,11,12)], 5)
 ```
 To summarize what has just been done: A bioconductor database was used to
@@ -123,14 +126,14 @@ That being said: There could be a connection between up/down regulation of certa
 genetic regions. Taking RPS4Y1, a gene encoding for a ribosomal sub unit,
 as an example: Could there be a trend in the mutation affecting down/up regulation
 of specifically ribosomal genes? Questions like these are not suited for EDA, but 
-the addition of gene symbols, KEGG pathway, ontology and entrezID's columns in this document 
+the addition of gene symbols, KEGG pathway, go and entrezID's columns in this document 
 will help in answering such questions, which will eventually mean answering the research question.
 
 Plotting the different KEGG IDs and ontological classifications can however offer insight into
 which pathways and classes are most prevalent.
 
 ```{r}
-barplot(table(main$ONTOLOGY), xlab = "Ontological Class", ylab = "Occurences")
+barplot(table(unlist(main$go)), xlab = "Ontological Class", ylab = "Occurences")
 ```
 The differing classes appear to be close in the amount of occurrences. Looking at
 the values in the lower and upper 2.5%  may net different results.
@@ -138,8 +141,8 @@ the values in the lower and upper 2.5%  may net different results.
 \newpage
 
 ```{r}
-barplot(table(high$ONTOLOGY), xlab = "Ontological Class", ylab = "Occurences", main ="Upper-tail")
-barplot(table(low$ONTOLOGY), xlab = "Ontological Class", ylab = "Occurences", main ="Lower-tail")
+barplot(table(unlist(high$go)), xlab = "Ontological Class", ylab = "Occurences", main ="Upper-tail")
+barplot(table(unlist(low$go)), xlab = "Ontological Class", ylab = "Occurences", main ="Lower-tail")
 ```
 The bar plots show that the lower-end and upper-end tails are also equally divided.
 
@@ -149,9 +152,9 @@ It may be possible to find distinctions between different classes by looking at
 the Log2FC values for every different class.
 
 ```{r}
-BP <- subset(main, ONTOLOGY == "BP")
-CC <- subset(main, ONTOLOGY == "CC")
-MF <- subset(main, ONTOLOGY == "MF")
+BP <- subset(main, go == "BP")
+CC <- subset(main, go == "CC")
+MF <- subset(main, go == "MF")
 
 summary(BP$log.2.fold.change)
 summary(CC$log.2.fold.change)
@@ -167,9 +170,11 @@ the fold change values of genes.
 To confirm this suspicion, t-test may be performed. Since multiple
 groups are being observed, an ANOVA test may be used.
 ```{r}
-summary(aov(main$log.2.fold.change~main$ONTOLOGY))
+main[is.na(main$go),]$go <- "unknown"
+main[main$go == "NULL",]$go <- "unknown"
+summary(aov(main$log.2.fold.change~unlist(main$go)))
 ```
-As can be seen from the results, the P-Value indicates that there's no significant
+As can be seen from the results, the P-Value indicates that there's a significant
 difference in Log2FC means of ontological classes.
 
 The same may be done for the pathways. The pathway column does have significantly more
@@ -177,12 +182,12 @@ unique occurrences than the ontological classifications. The ones with the most 
 log2FC values will therefore be shown and considered.
 
 ```{r}
-occur_path_high <- table(high$PATH)
+occur_path_high <- table(unlist(high$path))
 occur_path_high <- occur_path_high[order(occur_path_high, decreasing = TRUE)]
 occur_path_high[1:10] # list is around 160 diferent pathway entries long. 
 #Showing the 10 most prevelant ones at the higher end.
 
-occur_path_low <- table(low$PATH)
+occur_path_low <- table(unlist(low$path))
 occur_path_low <- occur_path_low[order(occur_path_low, decreasing = TRUE)]
 occur_path_low[1:10] # list is around 160 diferent pathway entries long. 
 #Showing the 10 most prevelant ones at the lower end.
