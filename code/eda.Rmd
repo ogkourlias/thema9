@@ -153,7 +153,6 @@ who did not, maybe a link can be seen between the two.
 ```{r}
 no_stroke <- main[main$stroke == 0,]
 stroke <- main[main$stroke == 1,]
-comb <- rbind(no_stroke, stroke)
 ggplot(main, aes(x=factor(stroke), y=age))+geom_boxplot()+ggtitle("Ages by stroke status")+
   xlab("Stroke")
 ```
@@ -183,6 +182,8 @@ These tests may be performed for all of the other attributes too. Showing them a
 individually would be redundant, since the correlations between having a stroke and
 the other attributes relating to the heart already have literature confirming them.
 
+\newpage
+
 The attributes, which may seem less influential at first would be worth checking
 manually. The marriage status being the first one to consider. This column is not
 a boolean number, even though it is comparable to the other 1 or 0 columns. For
@@ -204,3 +205,65 @@ barplot(vec, space = c(0,0,1,0), col = c("brown4", "cadetblue"),
                       "                       Stroke",""), ylab = "Log(Occurance)")
 legend("topright", c("Not Married", "Married"), fill = c("brown4", "cadetblue"))
 ```
+The data has been normalized, so that it may be properly displayed. The group of
+people with no stroke quite lower than the other group. This plot shows that for
+both groups, the amount of people who have ever been married is bigger than the
+not married group. It makes sense for there to be proportionally more people who have married
+than less when looking at the stroke bars. This is because people who have had
+a stroke are on average older than the other group. It is also safe to assume that
+the older a person is, the more likely that they have ever been married in their life.
+
+\newpage
+
+Now, it is possible to make a similar plot, but with a more relevant attribute.
+Heart disease would be a good choice.
+```{r}
+no_s_table <- log(table(no_stroke$heart_disease))
+s_table <- log(table(stroke$heart_disease))
+
+vec <- c(no_s_table[1], no_s_table[2], s_table[1], s_table[2])
+
+barplot(vec, space = c(0,0,1,0), col = c("brown4", "cadetblue"), 
+        names.arg = c("                       No Stroke","",
+                      "                       Stroke",""), ylab = "Log(Occurance)")
+legend("topright", c("No Heart disease", "Heart Disease"),
+       fill = c("brown4", "cadetblue"))
+```
+\newpage
+
+The assumption would be that a heart disease has a correlation with having a stroke.
+The bar plot above does not show anything out of the ordinary. It might be
+difficult to find any correlation by just looking at these bar plots. Calculating
+the differing odds between two groups could help.
+
+```{r}
+ratio1 <- as.vector(table(no_stroke$heart_disease)[2])/nrow(no_stroke)
+ratio2 <- as.vector(table(stroke$heart_disease)[2])/nrow(stroke)
+ratio1
+ratio2
+```
+In this case, it does appear that the ratio is different. A calculation can be
+made to determine how much more likely patients with heart conditions may get
+a stroke.
+
+```{r}
+ratio2/ratio1
+```
+Judging by that simple calculation, a patient with a heart condition has 4 times
+the likelihood of getting a stroke than someone without a heart condition.
+
+\newpage
+
+A bar plot showing the correlation between BMI and other attributes could
+also show correlations. Before doing that however, it seems that the BMI column
+consists of characters, not numbers. This must first be changed.
+
+```{r}
+typeof(main$bmi)
+main$bmi <- as.numeric(main$bmi)
+ggplot(main, aes(x=factor(stroke), y=bmi))+geom_boxplot()+ggtitle("BMI by stroke status")+
+  xlab("Stroke")
+```
+There are around 200 NA entries, which were not taken into consideration when 
+creating the plots.
+
