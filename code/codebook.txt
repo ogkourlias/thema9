@@ -1,0 +1,13 @@
+Column;Unit;Description
+ID;Number;Unique patient identifier
+Gender;Text; "Male", "Female" or "Other"
+Age;Number;Age of patient
+Hypertension;Boolean;Whether patient has hypertension
+Heart_disease;Boolean;Whether patient has a heart disease
+Ever_married;Boolean;Whether patient has ever been married
+Work_type;Text;Occupation status of patient
+Residence_type;Text;Patient living enviroment
+Avg_glucose_level;Number;Average glucose level in blood
+BMI;Number;Body mass index of patient
+Smoking_status;Boolean;Whether patient smokes or not
+Stroke;Boolean;Whether patient has ever experienced a stroke

@@ -1,0 +1,104 @@
+---
+title: "Exploratory Data Analysis: Which genes and their expression levels may be associated with developing familial alzheimer's disease?"
+author: "Orfeas Gkourlias"
+date: "`r Sys.Date()`"
+output:
+  pdf_document: default
+  html_document:
+    df_print: paged
+    
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(readr)
+library(ggplot2)
+library(lemon)
+library(knitr)
+codebook <- read_delim(file = "codebook.txt",
+                       delim = ";",
+                       show_col_types=FALSE)
+```
+
+\section{Introduction}
+This document aims to explore, analyse and explain the data set being used
+in answering the following research question: "Given 10 attributes, how do they 
+compare in predicting the chances of a person's risk of a stroke?". As the res
+earch question implies, the data set consists of 10 attributes. This project
+has the goal of comparing those attributes, so that the most likely predictors 
+for a stroke may be deduced. Some attributes affect each other, while others may
+not. Analysis of these correlations can help in finding the rankings of the attr
+ibutes.
+
+To get a feel for what the scope and attributes of the data set consists of, it
+will be loaded and the first 10 results will be displayed.
+
+```{r}
+main <- read.csv("../data/stroke-data.csv")
+head(main)
+nrow(main)
+```
+
+There are 12 attributes, 10 of which will be used in the analysis: Gender, age
+hypertension, heart_disease, ever_married, work_type, residence_type, avg_gluco
+se_level, bmi and smoking_status. The last column indicates whether the person has 
+already experienced a prior stroke. This can be used to the train the machine learning
+model which will be utilized to answer the research question.
+
+There are 5110 entries in this data set. This is also why the row numbers will
+not be replaced with the id's, because there is no order in the id numbers. They
+exceed the number 5110.
+
+The attributes and their units can be seen in the code book on the next page.
+\newpage   
+
+\section{Codebook}
+```{r}
+knitr::kable(codebook)
+```
+\section{Initial Data and Attributes}
+In this section, the attributes will be examined individually. What these attri
+butes could mean for the research question will be discussed. Correlations will
+be observed in a later section. Any preprocessing or cleanup required will
+also be performed in this section.
+
+## ID
+This column is neither noteworthy for analysis or data structure. This column
+will therefore be dropped, because the dataframe used already has row numbers
+and this makes the ID redundant.
+
+```{r}
+main <- main[2:12]
+```
+
+## Age
+The age of the patient. At first sight, it might look redundant for this data to
+be stored as a float, since most of the data consists of a rounded age number.
+Some of the entries contain very young patients. The younger a patient is, the 
+more important the specifity of the age is, since the age difference is
+still significant at that point. It is for that reason that any patient under the
+age of 2 will contain a float number, with two decimal numbers. A couple of those
+instances will be shown in vector format below:
+
+```{r}
+head(c(main[main$age < 2, 2]))
+```
+The likelihood of a person experiencing a stroke increases with age. This will
+therefore be an important attribute in the analysis.
+
+## Hypertension
+This indicates with a 0 or 1 whether the patient is affected by hypertension.
+The first attribute which is relevant to the heart status of a patient. These
+types of attributes will always be important, because any heart condition tends
+to come with an increased risk of experiencing a stroke. Since this is a boolean,
+the patient either has hyptertension, which is indicated with a 1, or not, which 
+is indicated with a 0. This could be a harder type for the later machine learning
+model to work with. Correlations will probably be found between hyptertension and
+the other attributes. No further cleanup is requried here.
+
+## Heart Disease
+Similar to the previous attribute, this is also an important element when
+trying to predict stroke risk. The previous observation also applies to this 
+attribute.
+
+## Ever married
