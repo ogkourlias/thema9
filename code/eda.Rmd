@@ -154,6 +154,53 @@ who did not, maybe a link can be seen between the two.
 no_stroke <- main[main$stroke == 0,]
 stroke <- main[main$stroke == 1,]
 comb <- rbind(no_stroke, stroke)
-ggplot(main, aes(x=factor(stroke), y=age))+geom_boxplot()+ggtitle("Ages by 
-                                                                  stroke status")
+ggplot(main, aes(x=factor(stroke), y=age))+geom_boxplot()+ggtitle("Ages by stroke status")+
+  xlab("Stroke")
+```
+\newpage
+
+This plot shows that the group of people who have had strokes are, on average,
+older than the group who has not experienced a stroke. This may also be observed
+with a summary
+```{r}
+summary(no_stroke$age)
+summary(stroke$age)
+```
+It is worth noting that the no stroke group does contain plenty of patients of higher
+age.
+
+Now, a t-test may be performed to determine whether age is a significant difference
+between the two groups. A one sample t-test is most appropriate here, considering that
+every patient's risk is independent from another
+
+```{r}
+t.test(no_stroke$age, stroke$age)[3]
+```
+Without considering the other attributes, it seems that with that p-value, the
+two age means are significantly different.
+
+These tests may be performed for all of the other attributes too. Showing them all
+individually would be redundant, since the correlations between having a stroke and
+the other attributes relating to the heart already have literature confirming them.
+
+The attributes, which may seem less influential at first would be worth checking
+manually. The marriage status being the first one to consider. This column is not
+a boolean number, even though it is comparable to the other 1 or 0 columns. For
+consistency, yes will become 1 and no will become 0.
+
+```{r}
+main[main$ever_married == "Yes",]$ever_married <- 1
+main[main$ever_married == "No",]$ever_married <- 0
+no_stroke <- main[main$stroke == 0,]
+stroke <- main[main$stroke == 1,]
+
+no_s_table <- log(table(no_stroke$ever_married))
+s_table <- log(table(stroke$ever_married))
+
+vec <- c(no_s_table[1], no_s_table[2], s_table[1], s_table[2])
+
+barplot(vec, space = c(0,0,1,0), col = c("brown4", "cadetblue"), 
+        names.arg = c("                       No Stroke","",
+                      "                       Stroke",""), ylab = "Log(Occurance)")
+legend("topright", c("Not Married", "Married"), fill = c("brown4", "cadetblue"))
 ```
