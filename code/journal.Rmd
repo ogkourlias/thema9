@@ -1,0 +1,106 @@
+---
+title: "Given 10 attributes, how do they compare in predicting the chances of a person's risk of a stroke?"
+author: "Orfeas Gkourlias"
+date: "`r Sys.Date()`"
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(readr)
+library(ggplot2)
+library(lemon)
+library(knitr)
+codebook <- read_delim(file = "codebook.txt",
+                       delim = ";",
+                       show_col_types=FALSE)
+main <- read.csv("../data/main.csv", check.names=FALSE)
+no_stroke <- main[main$stroke == 0,]
+stroke <- main[main$stroke == 1,]
+no_s_table <- log(table(no_stroke$heart_disease))
+s_table <- log(table(stroke$heart_disease))
+
+vec <- c(no_s_table[1], no_s_table[2], s_table[1], s_table[2])
+
+ratio1 <- as.vector(table(no_stroke$heart_disease)[2])/nrow(no_stroke)
+ratio2 <- as.vector(table(stroke$heart_disease)[2])/nrow(stroke)
+```
+\newpage
+
+\section{Results}
+Following the analysis of the dataset and the attributes within, some important
+correlations can be observed. Correlations relevant to the research question
+mostly consist of heart and health attributes. The first plot regarding heart d
+isease differences in non-stroke and stroke patients will be shown.
+
+```{r, echo=F}
+barplot(vec, space = c(0,0,1,0), col = c("brown4", "cadetblue"), 
+        names.arg = c("                       No Stroke","",
+                      "                       Stroke",""), ylab = "Log(Occurance)",
+        main = "Heart disease status by stroke history")
+legend("topright", c("No Heart disease", "Heart Disease"),
+       fill = c("brown4", "cadetblue"))
+```
+
+This plot of normalized data shows that there are proportionally more heart disease
+patients in the stroke group, than there are in the no stroke group. This ratio
+can be translated to a percentage. The percentage of
+patients who have not had a stroke is `r round(ratio1*100, 2)`%. This percen
+tage is higher for the group of patients who have experienced a stroke. For that
+group the percentage is `r round(ratio2*100, 2)`%. This means that it is 4 times as
+likely for someone who has had a stroke, to also have a heart condition.
+The literature on this subject seems to have come to a common consensus: There is
+a correlation between having a heart disease and a higher risk of a stroke, This 
+paper published by the American Heart Association being one of the bigger
+published works on the topic: [Heart Disease and Stroke Statistics—2020 Update: A Report From the American Heart Association](https://www.ahajournals.org/doi/full/10.1161/CIR.0000000000000757?rfr_dat=cr_pub++0pubmed&url_ver=Z39.88-2003&rfr_id=ori%3Arid%3Acrossref.org)
+(Keep in mind, the risk of developing heart disease AFTER  a stroke is also quite big.)
+
+The same can be seen in the case of hypertension, because that is also
+a heart condition.
+
+```{r, echo=F}
+no_s_table <- log(table(no_stroke$hypertension))
+s_table <- log(table(stroke$hypertension))
+
+vec <- c(no_s_table[1], no_s_table[2], s_table[1], s_table[2])
+
+barplot(vec, space = c(0,0,1,0), col = c("brown4", "cadetblue"), 
+        names.arg = c("                       No Stroke","",
+                      "                       Stroke",""), ylab = "Log(Occurance)",
+        main = "Heart disease status by stroke history")
+legend("topright", c("No Hypertension", "Hypertension"),
+       fill = c("brown4", "cadetblue"))
+```
+This plot is very similar to the prior one. That makes sense, because quite some
+heart conditions are accompanied by hypertension. Hypertension on its own
+is already classified as a heart condition too.
+
+\newpage
+Age has been observed to also be an important attribute. The older a person beco
+mes, the higher the likelihood of a stroke. Especially when combined with other
+attributes, such as hypertension or heart conditions. According to this paper, 
+the odds of having a stroke double for every ten years a person lives. 
+[Aging and ischemic stroke](https://www.ncbi.nlm.nih.gov/pmc/articles/PMC6535078/)
+
+```{r}
+ggplot(main, aes(x=factor(stroke), y=age))+geom_boxplot()+ggtitle("Ages by stroke status")+
+  xlab("Stroke")
+```
+This shows that the older a person is, the more likely they are to have experienced a stroke.
+This would of course make sense, considering that the older someone gets, the 
+higher the chance one might encounter health issues.
+
+Another health related observation that may be relevant is that of the BMI means
+for stroke and no stroke patients. This can be visualized through a similar box plot
+as the prior one.
+
+```{r}
+ggplot(main, aes(x=factor(stroke), y=bmi))+geom_boxplot()+ggtitle("BMI by stroke status")+
+  xlab("Stroke")
+```
+The patients who have had a stroke only have a slightly higher BMI. The no stroke
+group also has more extreme values on both ends.
+
+```{r}
+sapply(stroke[1,], table)
+```

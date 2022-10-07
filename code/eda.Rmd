@@ -1,5 +1,5 @@
 ---
-title: "Exploratory Data Analysis: Which genes and their expression levels may be associated with developing familial alzheimer's disease?"
+title: "Given 10 attributes, how do they compare in predicting the chances of a person's risk of a stroke?"
 author: "Orfeas Gkourlias"
 date: "`r Sys.Date()`"
 output:
@@ -144,7 +144,7 @@ used to train a machine learning model in the actual journal.
 
 \newpage
 # Correlations
-Following the examination of the intial values and attributes, they may
+Following the examination of the initial values and attributes, they may
 now be compared so that trends and correlations can be observed. Starting
 with the first attribute, which will most likely be important in determining
 stroke rist, age. By plotting the summaries of patients who had a stroke, and those
@@ -266,4 +266,12 @@ ggplot(main, aes(x=factor(stroke), y=bmi))+geom_boxplot()+ggtitle("BMI by stroke
 ```
 There are around 200 NA entries, which were not taken into consideration when 
 creating the plots.
+
+Now that the main data set has also been cleaned up, it will be written to a .csv
+file, so that it may be used in the journal.
+
+```{r}
+path_out = "../data/"
+write.csv(main, paste(path_out, "main.csv", sep = ""))
+```
 
