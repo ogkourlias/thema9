@@ -16,8 +16,8 @@ codebook <- read_delim(file = "codebook.txt",
                        delim = ";",
                        show_col_types=FALSE)
 main <- read.csv("../data/main.csv", check.names=FALSE)
-no_stroke <- main[main$stroke == 0,]
-stroke <- main[main$stroke == 1,]
+no_stroke <- main[main$stroke == "No",]
+stroke <- main[main$stroke == "Yes",]
 no_s_table <- log(table(no_stroke$heart_disease))
 s_table <- log(table(stroke$heart_disease))
 
@@ -107,7 +107,7 @@ Something important which can be observed in the data is the imbalance between
 stroke instances. A barplot will be used to demonstrate this imbalance
 
 ```{r, echo=F}
-ggplot(data = main) +   geom_bar(mapping = aes(x = stroke))+ ggtitle("Stroke 0 to 1 ratio.")
+ggplot(data = main) +   geom_bar(mapping = aes(x = stroke))+ ggtitle("Stroke No/Yes Comparison")
 ratio <- round(nrow(main[main$stroke == 0,]) / nrow(main), 3)
 ```
 

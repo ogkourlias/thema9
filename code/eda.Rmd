@@ -151,8 +151,18 @@ stroke rist, age. By plotting the summaries of patients who had a stroke, and th
 who did not, maybe a link can be seen between the two.
 
 ```{r}
-no_stroke <- main[main$stroke == 0,]
-stroke <- main[main$stroke == 1,]
+main$stroke <- factor(main$stroke, labels = c("No", "Yes"))
+main$gender <- factor(main$gender)
+main$hypertension <- factor(main$hypertension, labels = c("No", "Yes"))
+main$heart_disease <- factor(main$heart_disease, labels = c("No", "Yes"))
+main$hypertension <- factor(main$hypertension, labels = c("No", "Yes"))
+main$ever_married <- factor(main$ever_married, labels = c("No", "Yes"))
+main$work_type <- factor(main$work_type)
+main$Residence_type <- factor(main$Residence_type)
+main$smoking_status <- factor(main$smoking_status)
+
+no_stroke <- main[main$stroke == "No",]
+stroke <- main[main$stroke == "Yes",]
 ggplot(main, aes(x=factor(stroke), y=age))+geom_boxplot()+ggtitle("Ages by stroke status")+
   xlab("Stroke")
 ```
@@ -190,10 +200,8 @@ a boolean number, even though it is comparable to the other 1 or 0 columns. For
 consistency, yes will become 1 and no will become 0.
 
 ```{r}
-main[main$ever_married == "Yes",]$ever_married <- 1
-main[main$ever_married == "No",]$ever_married <- 0
-no_stroke <- main[main$stroke == 0,]
-stroke <- main[main$stroke == 1,]
+no_stroke <- main[main$stroke == "No",]
+stroke <- main[main$stroke == "Yes",]
 
 no_s_table <- log(table(no_stroke$ever_married))
 s_table <- log(table(stroke$ever_married))
