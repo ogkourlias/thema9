@@ -272,6 +272,6 @@ file, so that it may be used in the journal.
 
 ```{r}
 path_out = "../data/"
-write.csv(main, paste(path_out, "main.csv", sep = ""))
+write.csv(main, paste(path_out, "main.csv", sep = ""), row.names = FALSE)
 ```
 

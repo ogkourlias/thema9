@@ -9,6 +9,7 @@ output: pdf_document
 knitr::opts_chunk$set(echo = TRUE)
 library(readr)
 library(ggplot2)
+library(tidyr)
 library(lemon)
 library(knitr)
 codebook <- read_delim(file = "codebook.txt",
@@ -82,7 +83,7 @@ attributes, such as hypertension or heart conditions. According to this paper,
 the odds of having a stroke double for every ten years a person lives. 
 [Aging and ischemic stroke](https://www.ncbi.nlm.nih.gov/pmc/articles/PMC6535078/)
 
-```{r}
+```{r, echo=F}
 ggplot(main, aes(x=factor(stroke), y=age))+geom_boxplot()+ggtitle("Ages by stroke status")+
   xlab("Stroke")
 ```
@@ -94,13 +95,73 @@ Another health related observation that may be relevant is that of the BMI means
 for stroke and no stroke patients. This can be visualized through a similar box plot
 as the prior one.
 
-```{r}
+```{r, echo=F}
 ggplot(main, aes(x=factor(stroke), y=bmi))+geom_boxplot()+ggtitle("BMI by stroke status")+
   xlab("Stroke")
 ```
 The patients who have had a stroke only have a slightly higher BMI. The no stroke
 group also has more extreme values on both ends.
 
-```{r}
-sapply(stroke[1,], table)
+## Imbalance
+Something important which can be observed in the data is the imbalance between
+stroke instances. A barplot will be used to demonstrate this imbalance
+
+```{r, echo=F}
+ggplot(data = main) +   geom_bar(mapping = aes(x = stroke))+ ggtitle("Stroke 0 to 1 ratio.")
+ratio <- round(nrow(main[main$stroke == 0,]) / nrow(main), 3)
 ```
+
+As can be seen, there is a great imbalance in the amount of patients who
+have had a stroke those who have not. To be exact: `r ratio*100`% of the data,
+consists of rows where stroke is equal to 0. The remaining 5% has experienced
+a stroke. This will be very important when selecting for different machine learn
+ing algorithms, because the weighting of occurrences will most likely have to be
+changed in this case.
+
+\newpage
+
+# Discussion
+Now that the most important results have been shown, some points of contention
+could be considered. The aim of this project is to answer the original research
+question using machine learning. This may be done with varying algorithms and 
+considering different attributes. Looking at the results, some of the attribute
+s may seem irrelevant at first, and some would argue these could be removed before
+applying any machine learning algorithms. But in this case, none of the attributes
+will be discarded. The program being used, Weka, has multiple functions which allow
+for the automation of this process. By allowing Weka to select the most influential
+attributes systematically, biases may be avoided.
+
+In addition to the data selection, the imbalance is also important to consider.
+One way to tackle this problem is by generating samples in the minority class.
+That class being the 1 instances under the stroke attribute. Another option was
+to use SMOTE (Synthetic Minority Oversampling Technique).  This method was chosen
+because it is effectively a more accurate version of oversampling. SMOTE will 
+generate synthetic data points, so that the absence of balance will be remedied.
+Whether this should be remedied might also be debatable. Some may argue that the
+raw data ratio would be an accurate representation. But considering that the 
+difference is this extreme, SMOTE was chosen regardless.
+
+## Weighin False positives/ False Negatives
+When looking at the significane of false positives and negatives, the effect of
+both must be considered relative to their dataset. In this case, false positive
+and negatives both have differing degrees of severity. When a false positive gets
+detected, a patient will falsely be classified as being at risk of having a stroke.
+Using a machine learning model as the only diagnosis method should never
+be the only course of action. It is therefore safe to assume that followup
+medical examinations of the patient will be performed, allowing for the false p
+ositive to be corrected. In this worst case, when the false positive does not
+get corrected, a patient may have to adjust their lifestyle and take medication.
+There are no negatives to the first solution, since the majority of lifestyle 
+adjustments will overlap with the general consensus on what it means to live
+a healthy life. The potential of medication would be problematic, because exposing
+someone to unnecessary medication is never good.
+
+Now, to compare that to the consequences of a false negative. In the case of a false
+negative, a person who is at risk of getting a stroke, will be classified a someone
+who is not actually at risk. This means that the person will have to go through life
+with an ever increasing risk, since the risk also gets higher the older a person gets.
+The implication being that the person will eventually get an unexpected stroke, which
+will most likely lead to life debilitating consequences, or even death.
+
+It is for that reason that the false negatives are weighted significantly stricter than
+false positives, because the outcomes for a patient are so detrimental for the latter.
