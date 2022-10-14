@@ -15,6 +15,9 @@ library(readr)
 library(ggplot2)
 library(lemon)
 library(knitr)
+library(RWeka)
+library(DMwR)
+require(caTools)
 codebook <- read_delim(file = "codebook.txt",
                        delim = ";",
                        show_col_types=FALSE)
@@ -283,3 +286,52 @@ path_out = "../data/"
 write.csv(main, paste(path_out, "main.csv", sep = ""), row.names = FALSE)
 ```
 
+# Weka Model Exploration.
+The data set can now be put through weka algorithm testing. The goal here is to train
+an algorithm which will have the most accuracy when it comes to stroke prediction.
+RWeka is a package which allows for Weka procedures to be performed in R.
+
+The main file is currently a .csv file. Weka works better with .arff files, so
+it will therefore be copied to an .arff format for future use.
+```{r}
+RWeka::write.arff(main, file = paste(path_out, "main.arff", sep = ""))
+```
+
+## Data imbalance and ZeroR
+Something else which is of high importance is the data imbalance. To properly train
+the model, there need to be more entries where the stroke class indicates "Yes".
+Otherwise, the ZeroR algorithm will net the highest accuracy, which makes sense
+with the current imbalance. 95% of the data entries have not yet had a stroke.
+ZeroR will therefore offer the highest accuracy of 95% with this balance.
+
+It is for that reason that an oversampling technique was chosen to help 
+combat this problem. Synthetic Minority Oversampling Technique (SMOTE) will
+be used to this end. SMOTE can be performed using the DMwR package.
+
+It is important the training data is not affected by SMOTE, but the test
+data may be modified.
+
+```{r}
+set.seed(101) 
+sample = sample.split(main$stroke, SplitRatio = .75)
+train = subset(main, sample == TRUE)
+test  = subset(main, sample == FALSE)
+smote_df <- SMOTE(stroke ~., test, perc.over = 1800, perc.under = 200)
+table(main$stroke)
+table(smote_df$stroke)
+```
+The tables show the difference pre and post SMOTE application. This
+will also be written to an .arff file for Weka.
+
+```{r}
+RWeka::write.arff(train, file = paste(path_out, "train.arff", sep = ""))
+RWeka::write.arff(test, file = paste(path_out, "test.arff", sep = ""))
+```
+
+Performing ZeroR on this new arff file gives an accuracy of 65%. This is
+still an imbalance, but not as severe as before. Models may now be trained using
+different classifiers.
+
+## NaiveBayes
+Performing NaiveBayes on the SMOTE dataset provides an accuracy of 81.05%. This
+is already more accurate than simply performing a ZeroR.
