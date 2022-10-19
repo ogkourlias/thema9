@@ -27,12 +27,12 @@ codebook <- read_delim(file = "codebook.txt",
 \section{Introduction}
 This document aims to explore, analyse and explain the data set being used
 in answering the following research question: "What is the most accurate model
-in predicting the stroke risk of a person given 10 attributes?". As the res
-earch question implies, the data set consists of 10 attributes. This project
+in predicting the stroke risk of a person given 10 attributes?". As the research
+question implies, the data set consists of 10 attributes. This project
 has the goal of comparing those attributes, so that the most likely predictors 
 for a stroke may be deduced. Some attributes affect each other, while others may
-not. Analysis of these correlations can help in finding the rankings of the attr
-ibutes. The final answer to the research question will be found using Weka, a data
+not. Analysis of these correlations can help in finding the rankings of the attributes.
+The final answer to the research question will be found using Weka, a data
 platform which utilizes machine learning.
 
 To get a feel for what the scope and attributes of the data set consists of, it
@@ -45,8 +45,8 @@ nrow(main)
 ```
 
 There are 12 attributes, 10 of which will be used in the analysis: Gender, age
-hypertension, heart_disease, ever_married, work_type, residence_type, avg_gluco
-se_level, bmi and smoking_status. The last column indicates whether the person has 
+hypertension, heart_disease, ever_married, work_type, residence_type, avg_glucose_level,
+BMI and smoking_status. The last column indicates whether the person has 
 already experienced a prior stroke. This can be used to the train the machine learning
 model which will be utilized to answer the research question.
 
@@ -65,12 +65,12 @@ knitr::kable(codebook)
 \section{Initial Data and Attributes}
 In this section, the attributes will be examined individually. What these attributes
 could mean for the research question will be discussed. Correlations will
-be observed in a later section. Any preprocessing or cleanup required will
+be observed in a later section. Any pre-processing or cleanup required will
 also be performed in this section.
 
 ## ID
 This column is neither noteworthy for analysis or data structure. This column
-will therefore be dropped, because the dataframe used already has row numbers
+will therefore be dropped, because the data frame used already has row numbers
 and this makes the ID redundant.
 
 ```{r}
@@ -206,7 +206,7 @@ who did not, maybe a link can be seen between the two.
 ```{r}
 no_stroke <- main[main$stroke == "No",]
 stroke <- main[main$stroke == "Yes",]
-ggplot(main, aes(x=factor(stroke), y=age))+geom_boxplot()+ggtitle("Ages by stroke status")+
+ggplot(main, aes(x=factor(stroke), y=age))+geom_boxplot()+ggtitle("Ages by stroke history")+
   xlab("Stroke")
 ```
 \newpage
@@ -331,7 +331,9 @@ write.csv(main, paste(path_out, "main.csv", sep = ""), row.names = FALSE)
 # Weka Model Exploration.
 The data set can now be put through weka algorithm testing. The goal here is to train
 an algorithm which will have the most accuracy when it comes to stroke prediction.
-RWeka is a package which allows for Weka procedures to be performed in R.
+RWeka is a package which allows for some Weka procedures to be performed in R.
+Specifically the writing of .arff files from data frames. Whenever a procedure
+was performed in the Weka program itself, it will be specified in this document.
 
 The main file is currently a .csv file. Weka works better with .arff files, so
 it will therefore be copied to an .arff format for future use.
@@ -350,20 +352,27 @@ It is for that reason that an oversampling technique was chosen to help
 combat this problem. Synthetic Minority Oversampling Technique (SMOTE) will
 be used to this end. SMOTE can be performed using the DMwR package.
 
-It is important the training data is not affected by SMOTE, but SMOTE may
-be performed on the data which will be use to test the model.
+Another important part of properly training a model is separation between train
+and test data sets. In this case, there is only one data set present. This data set
+can be divided into two separate files, so that one may be used for training
+purposes and the other for testing purposes. An algorithm will be applied to
+the first, then the resulting model will be tested on the latter. 
+
+SMOTE may not be applied on the training data set. The data will first be divided
+and then have the sampling technique applied to the training data. 1/4th of the
+data will be used for testing, and the remaining for training.
 
 ```{r}
 set.seed(101) 
 sample = sample.split(main$stroke, SplitRatio = .75)
 train = subset(main, sample == TRUE)
 test  = subset(main, sample == FALSE)
-smote_df <- SMOTE(stroke ~., test, perc.over = 1800, perc.under = 200)
+train <- SMOTE(stroke ~., train, perc.over = 1800, perc.under = 200)
 table(main$stroke)
-table(smote_df$stroke)
+table(train$stroke)
 ```
-The tables show the difference pre and post SMOTE application. This
-will also be written to an .arff file for Weka.
+The tables show the difference pre and post SMOTE application. Both the subsets
+will be written to separate .arff files.
 
 ```{r}
 RWeka::write.arff(train, file = paste(path_out, "train.arff", sep = ""))
@@ -374,8 +383,43 @@ Performing ZeroR on this new .arff file gives an accuracy of 65%. This is
 still an imbalance, but not as severe as before. Models may now be trained using
 different classifiers.
 
-## NaiveBayes
-Performing a default settings Naive Bayes on the SMOTE data set provides an
-accuracy of 81.05%. This is already more accurate than simply performing a ZeroR.
+Following the separation and SMOTE application, all the following algorithm
+exploration will be done in the following order: The algorithm will be trained
+using the SMOTE training set. Then the test set will be the supplied test set
+in weka. The resulting accuracy will be the result of that execution.
 
-## Random forest 
+## Naive Bayes
+Applying a default Naive Bayes on the data sets provides an accuracy of 77.603%.
+With 991 correctly classified instances and 286 incorrectly classified instances.
+The attribute that is being predicted for is a binary one. The application of the
+"Naive Bayes Multinominal Text" algorithm provide a higher accuracy of 95.14%.
+This is already a quite impressive result being the first of the linear classifiers.
+
+## K-Nearest Neighbors
+This algorithm is named as "IBk" in weka, meaning instanced based learner.
+Using the default settings on the test, an accuracy of 78.856% is reached. While
+better than the default Naive Bayes test, it is not better than the multinominal
+text variation. Changing the nearest neighbour search algorithm from the default
+linear NN search does not net any better results.
+
+Now some decision tree algorithms will be explored.
+
+## Decision Stump
+Default execution of this algorithm nets an accuracy of 59.122%. Any alteration to
+the settings is unlikely to show a significant increase in accuracy when the
+default is already this low.
+
+## J48
+This algorithm results in a 85.905% accuracy. Playing with the settings either
+gives a similar or lower accuracy. Looking at other decision tree algorithms
+will most likely provide higher accuracy.
+
+## Random tree
+The random tree algorithm gives a 77.291% accuracy. Changing the break ties setting
+from false to true, allows for slightly better accuracy. The result of this is 
+79.404%. Changing other settings does not provide a better accuracy.
+
+## Random forest
+A random forest algorithm results in 81.989% accuracy. The only t hing affecting
+the accuracy to a significnat degree is the number of iteratoins, which gives 
+a percentage of increase in accuracy.
