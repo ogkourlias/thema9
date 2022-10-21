@@ -364,8 +364,6 @@ were also found, especially when observing the attributes related to cardiology.
 The data is a good candidate for analysis using machine learning algorithms, now
 that the data has been polished and trimmed.
 
-\newpage
-
 ```{r}
 path_out = "../data/"
 write.csv(main, paste(path_out, "main.csv", sep = ""), row.names = FALSE)
