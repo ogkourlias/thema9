@@ -19,6 +19,7 @@ library(lemon)
 library(knitr)
 library(RWeka)
 library(DMwR)
+library(Hmisc)
 require(caTools)
 codebook <- read_delim(file = "codebook.txt",
                        delim = ";",
@@ -59,24 +60,24 @@ exceed the number 5110.
 The attributes and their units can be seen in the code book on the next page.
 \newpage   
 
-# Codebook
+# Codebook.
 ```{r}
 knitr::kable(codebook)
 ```
 \newpage
-# 1. Exploratory data analysis
+# 1. Exploratory data analysis.
 The exploratory data analysis consists of multiple sections. In the first section,
 the raw data will be observed and interpreted. Any cleaning up or filtering of the
 data will also be performed in this first section. Following the first section will
 be the exploration of correlations in the data. This part will explain how the
 attributes may affect each other, and whether any trends can be observed.
 
-## 1.1. Initial data and attributes
+## 1.1. Initial data and attributes.
 In this section, the attributes will be examined individually. What these attributes
 could mean for the research question will be discussed. 
 Any pre-processing or cleanup required will also be performed in this section.
 
-### ID
+### ID.
 This column is neither noteworthy for analysis or data structure. This column
 will therefore be dropped, because the data frame used already has row numbers
 and this makes the ID redundant.
@@ -85,7 +86,7 @@ and this makes the ID redundant.
 main <- main[2:12]
 ```
 
-### Age
+### Age.
 The age of the patient. At first sight, it might look redundant for this data to
 be stored as a float, since most of the data consists of a rounded age number.
 Some of the entries contain very young patients. The younger a patient is, the 
@@ -100,7 +101,7 @@ head(c(main[main$age < 2, 2]))
 The likelihood of a person experiencing a stroke increases with age. This will
 therefore be an important attribute in the analysis.
 
-### Gender
+### Gender.
 Gender, containing three separate values: Male, Female and other. There could be
 a correlation in the gender and stroke risk of a person. An example of gender
 indirectly affecting the stroke risk of a patient would be the age difference
@@ -114,7 +115,7 @@ main$gender <- factor(main$gender)
 
 \newpage
 
-### Hypertension
+### Hypertension.
 This indicates with a 0 or 1 whether the patient is affected by hypertension.
 The first attribute which is relevant to the heart status of a patient. These
 types of attributes will always be important, because any heart condition tends
@@ -133,7 +134,7 @@ main$hypertension <- factor(main$hypertension, labels = c("No", "Yes"))
 The datatypes were also changed to that of a factor. This has been done so that
 later functions will properly work on the data.
 
-### Heart Disease
+### Heart Disease.
 Similar to the previous attribute, this is also an important element when
 trying to predict stroke risk. The previous observation also applies to this 
 attribute.
@@ -142,7 +143,7 @@ attribute.
 main$heart_disease <- factor(main$heart_disease, labels = c("No", "Yes"))
 ```
 
-### Ever married
+### Ever married.
 This displays whether the patient has ever been married in their lifetime. This
 will most likely not bet detrimental in predicting the stroke risks of patients.
 But this is part of the data set, so it will therefore be compared with the other
@@ -152,7 +153,7 @@ attributes, to see where it ranks with it's prediction.
 main$ever_married <- factor(main$ever_married, labels = c("No", "Yes"))
 ```
 
-### Work Type
+### Work Type.
 A similar attribute to the prior one. Will most likely not be a good predictor
 for stroke risk. But it may rank higher than the marriage attribute. Some sectors
 could theoretically expose a person to environments where strokes are more likely.
@@ -163,7 +164,7 @@ main$work_type <- factor(main$work_type)
 
 \newpage
 
-### Residence Type
+### Residence Type.
 Considering that some types of residency might be healthier than others, this
 attribute may be slightly important in determining the stroke risk of a person.
 
@@ -171,13 +172,13 @@ attribute may be slightly important in determining the stroke risk of a person.
 main$Residence_type <- factor(main$Residence_type)
 ```
 
-### Average Glucose Level
+### Average Glucose Level.
 This may be more important than the prior three attributes, especially when these
 levels are unusually low or high. The literature concerning glucose levels and
 their connection to strokes is still being debated. Some papers conclude that
 it is not detrimental when observed in non-diabetic people.
 
-### BMI
+### BMI.
 The body mass index is an indicator for how a person's weight/height ratio. Age 
 and gender also being taken into consideration for the calculation. Both extreme
 ends of this attribute could be important to the stroke risk of a person. Higher
@@ -185,7 +186,27 @@ BMI levels are also associated with developing heart disease. Glucose levels may
 be affected. Several other attributes are most likely going to have a correlation
 to this attribute.
 
-### Smoking Status
+It is worth noting that this is the only attribute with missing values. This
+can be shown with a summary. Before doing that however, it seems that the BMI
+column consists of characters, not numbers. This must first be changed.
+```{r}
+typeof(main$bmi)
+main$bmi <- as.numeric(main$bmi)
+summary(main$bmi)
+```
+There appears to be 201 missing values. Imputation will be chosen to remedy this.
+Because of the insignificant amount, and the attribute being a numerical one, 
+making it easier to fill in missing data properly. This will be done with the 
+usage of the "Hmisc" package. Median will be chosen for the new values because
+the median is not affected by extreme values, unlike mean. Extreme values are plenty
+under the BMI attribute in this dataset.
+
+```{r}
+main$bmi <- as.vector(impute(main$bmi, median))
+main$bmi <- round(main$bmi, 1)
+```
+
+### Smoking Status.
 Whether a patient is smoking will most likely affect some of the other attribute
 s in this data set. Whether these significant correlations will need to be tested.
 The smoking status is unknown for some of the patients.
@@ -194,7 +215,7 @@ The smoking status is unknown for some of the patients.
 main$smoking_status <- factor(main$smoking_status)
 ```
 
-### Stroke
+### Stroke.
 The column indicating whether the patient has ever had a stroke. This is the
 classifier which will be predicted for in the final model, with the highest
 possible accuracy.
@@ -204,14 +225,14 @@ main$stroke <- factor(main$stroke, labels = c("No", "Yes"))
 ```
 
 \newpage
-## 1.2 Correlations
+## 1.2. Correlations.
 Following the examination of the initial values and attributes, they may
 now be compared so that trends and correlations can be observed. Starting
 with the first attribute, which will most likely be important in determining
 stroke risk, age. By plotting the summaries of patients who had a stroke, and those
 who did not, maybe a link can be seen between the two.
 
-```{r age_by_stroke, fig.cap="Boxplot of age distribution grouped by stroke status."}
+```{r age_by_stroke, fig.cap="Boxplots of age distribution grouped by stroke status."}
 no_stroke <- main[main$stroke == "No",]
 stroke <- main[main$stroke == "Yes",]
 ggplot(main, aes(x=factor(stroke), y=age))+geom_boxplot()+
@@ -271,6 +292,7 @@ barplot(vec, space = c(0,0,1,0), col = c("brown4", "cadetblue"),
 legend("topright", c("Not Married", "Married"), fill = c("brown4", "cadetblue"))
 ```
 
+
 The data has been normalized, so that it may be properly displayed. The group of
 people with no stroke quite lower than the other group. This plot shows that for
 both groups, the amount of people who have ever been married is bigger than the
@@ -283,7 +305,7 @@ the older a person is, the more likely that they have ever been married in their
 
 Now, it is possible to make a similar plot, but with a more relevant attribute.
 Heart disease would be a good choice.
-```{r}
+```{r heart_and_stroke, fig.cap="Barplots of normalized heart disease status grouped by stroke status"}
 no_s_table <- log(table(no_stroke$heart_disease))
 s_table <- log(table(stroke$heart_disease))
 
@@ -296,6 +318,7 @@ barplot(vec, space = c(0,0,1,0), col = c("brown4", "cadetblue"),
 legend("topright", c("No Heart disease", "Heart Disease"),
        fill = c("brown4", "cadetblue"))
 ```
+
 \newpage
 
 The assumption would be that a heart disease has a correlation with having a stroke.
@@ -322,20 +345,26 @@ the likelihood of getting a stroke than someone without a heart condition.
 \newpage
 
 A bar plot showing the correlation between BMI and other attributes could
-also show correlations. Before doing that however, it seems that the BMI column
-consists of characters, not numbers. This must first be changed.
+also show correlations.
 
-```{r}
-typeof(main$bmi)
-main$bmi <- as.numeric(main$bmi)
+```{r bmi_by_stroke, fig.cap="Boxplots of BMI distribution grouped by stroke status."}
 ggplot(main, aes(x=factor(stroke), y=bmi))+geom_boxplot()+ggtitle("BMI by stroke status")+
-  xlab("Stroke")
+  xlab("Stroke")+
+  theme(plot.title = element_text(hjust = 0.5), plot.caption = element_text(hjust=0),
+        axis.title.x = element_text(margin = unit(c(5, 0, 0, 0), "mm")))
 ```
-There are around 200 NA entries, which were not taken into consideration when 
-creating the plots.
 
-Now that the main data set has also been cleaned up, it will be written to a .csv
-file, so that it may be used in the journal.
+\newpage
+
+## 1.3. Overview.
+In finishing the exploratory data analysis section of the journal, more insight was
+gained into the implications of the data and the attribute properties. Correlations
+were also found, especially when observing the attributes related to cardiology.
+
+The data is a good candidate for analysis using machine learning algorithms, now
+that the data has been polished and trimmed.
+
+\newpage
 
 ```{r}
 path_out = "../data/"
