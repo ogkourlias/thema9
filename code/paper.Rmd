@@ -140,28 +140,3 @@ generate synthetic data points, so that the absence of balance will be remedied.
 Whether this should be remedied might also be debatable. Some may argue that the
 raw data ratio would be an accurate representation. But considering that the 
 difference is this extreme, SMOTE was chosen regardless.
-
-## Weighin False positives/ False Negatives
-When looking at the significane of false positives and negatives, the effect of
-both must be considered relative to their dataset. In this case, false positive
-and negatives both have differing degrees of severity. When a false positive gets
-detected, a patient will falsely be classified as being at risk of having a stroke.
-Using a machine learning model as the only diagnosis method should never
-be the only course of action. It is therefore safe to assume that followup
-medical examinations of the patient will be performed, allowing for the false p
-ositive to be corrected. In this worst case, when the false positive does not
-get corrected, a patient may have to adjust their lifestyle and take medication.
-There are no negatives to the first solution, since the majority of lifestyle 
-adjustments will overlap with the general consensus on what it means to live
-a healthy life. The potential of medication would be problematic, because exposing
-someone to unnecessary medication is never good.
-
-Now, to compare that to the consequences of a false negative. In the case of a false
-negative, a person who is at risk of getting a stroke, will be classified a someone
-who is not actually at risk. This means that the person will have to go through life
-with an ever increasing risk, since the risk also gets higher the older a person gets.
-The implication being that the person will eventually get an unexpected stroke, which
-will most likely lead to life debilitating consequences, or even death.
-
-It is for that reason that the false negatives are weighted significantly stricter than
-false positives, because the outcomes for a patient are so detrimental for the latter.

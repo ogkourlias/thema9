@@ -371,8 +371,19 @@ path_out = "../data/"
 write.csv(main, paste(path_out, "main.csv", sep = ""), row.names = FALSE)
 ```
 
-# Weka Model Exploration.
-The data set can now be put through weka algorithm testing. The goal here is to train
+\newpage
+
+# 2. Machine Learning & Weka.
+In this section, the various ways of training a machine learning algorithm will
+be tried and tested. The data frame will first be prepared for Weka usage. Second
+follows an examination of what results will be important considering the data set.
+So that the most important metrics can be accounted for. This will all be done
+to make guarantee that the maximum potential of the algorithms is being observed
+in the third and last section, in which the program Weka will be used to train machine
+learning models for predicting the stroke attribute.
+
+## 2.1. Weka.
+The data set will soon be put through weka algorithm testing. The goal here is to train
 an algorithm which will have the most accuracy when it comes to stroke prediction.
 RWeka is a package which allows for some Weka procedures to be performed in R.
 Specifically the writing of .arff files from data frames. Whenever a procedure
@@ -384,12 +395,43 @@ it will therefore be copied to an .arff format for future use.
 RWeka::write.arff(main, file = paste(path_out, "main.arff", sep = ""))
 ```
 
-# 2. Machine learning
+## 2.2. Important Metrics.
+The accuracy of a model will be most important, followed by the sensitivity The
+following section will explain why detecting true negatives and the specificity,
+are so important in this case.
 
-## 2.1. Data imbalance and ZeroR
-Something else which is of high importance is the data imbalance. To properly train
-the model, there need to be more entries where the stroke class indicates "Yes".
-Otherwise, the ZeroR algorithm will net the highest accuracy, which makes sense
+### Specificity
+When looking at the significance of false positives and negatives, the effect of
+both must be considered relative to their data set. In this case, false positive
+and negatives both have differing degrees of severity. When a false positive gets
+detected, a patient will falsely be classified as being at risk of having a stroke.
+Using a machine learning model as the only diagnosis method should never
+be the only course of action. It is therefore safe to assume that followup
+medical examinations of the patient will be performed, allowing for the false p
+positive to be corrected. In this worst case, when the false positive does not
+get corrected, a patient may have to adjust their lifestyle and take medication.
+There are no negatives to the first solution, since the majority of lifestyle 
+adjustments will overlap with the general consensus on what it means to live
+a healthy life. But the potential of medication would be problematic, because exposing
+someone to unnecessary medication could endanger a patient's health.
+
+Now, to compare that to the consequences of a false negative. In the case of a false
+negative, a person who is at risk of getting a stroke, will be classified a someone
+who is not actually at risk. This means that the person will have to go through life
+with an ever increasing risk, since the risk also gets higher the older a person gets.
+The implication being that the person will eventually suffer an unexpected stroke, which
+will most likely lead to life debilitating consequences, or even death.
+
+It is for that reason that the false negatives are weighted significantly stricter than
+false positives, because the outcomes for a patient are so detrimental for the latter.
+This is the reasoning as to why the sensitivity will be considered more in
+training a model over specificity.
+
+
+### Data imbalance and ZeroR
+Something else which is of high importance is the data imbalance. To properly test
+the model, there needs to be more entries where the stroke class indicates "Yes".
+Otherwise, the ZeroR algorithm will always net the highest accuracy, which makes sense
 with the current imbalance. 95% of the data entries have not yet had a stroke.
 ZeroR will therefore offer the highest accuracy of 95% with this balance.
 
@@ -427,6 +469,8 @@ RWeka::write.arff(test, file = paste(path_out, "test.arff", sep = ""))
 Performing ZeroR on this new .arff file gives an accuracy of 65%. This is
 still an imbalance, but not as severe as before. Models may now be trained using
 different classifiers.
+
+## 2.3. Weka Model Exploration.
 
 Following the separation and SMOTE application, all the following algorithm
 exploration will be done in the following order: The algorithm will be trained
