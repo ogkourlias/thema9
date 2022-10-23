@@ -480,7 +480,7 @@ will be displayed below.
 
 ```{=Latex}
 \begin{table}[thb]
-\caption{\label{labelname} Weka experimenter results showing accuracy, false negative
+\caption{\label{labelname} Weka experimenter algorithm results showing accuracy, false negative
 rate and the ROC. ZeroR being the basline for which improvement or degradation is shown.}
 \footnotesize
 {\centering \begin{tabular}{lrr@{\hspace{0.1cm}}cr@{\hspace{0.1cm}}cr@{\hspace{0.1cm}}cr@{\hspace{0.1cm}}cr@{\hspace{0.1cm}}cr@{\hspace{0.1cm}}cr@{\hspace{0.1cm}}c}
@@ -502,7 +502,54 @@ ROC & 0.50 & 0.89 & $\circ$ & 0.88 & $\circ$ & 0.90 & $\circ$ & 0.81 & $\circ$ &
 
 The table shows that there are significant differences between the algorithms.
 Every algorithm will be examined and discussed, so that the best one can be found.
-All the algorithm tests were done with the default settings.
+All the algorithm tests were done with the default settings. Now, considering the
+importance of false negatives, these are also displayed. The ROC value is also
+being compared.
+
+The accuracy of the algorithms are quite close to eachother. All of them being
+higher than 65.45%, the ZeroR accuracy. The lowest being NaiveBayes, at 80.62%.
+The highest scoring one is RandomForest with 93.17%. RandomForest seems to outperform
+the other algorithms except OneR on every important metric. The False negative rate
+is slightly lower for OneR, while having an accuracy difference lower than 1%.
+The ROC values do differ a bit, with RandomForest having an excellent ROC value of 0.98.
+This is 0.09 higher than the ROC value of OneR. These two algorithms are the main
+contenders for now.
+
+Because of the importance of false negatives, another experiment will be performed.
+This experiment will use the same algorithms, but with a cost sensitive classifier,
+where the matrix has an increased cost value of 2 for false negatives. False positives
+remain at a scoring value of 1. Performing the algorithms with these settings
+results in the following table.
+
+```{=Latex}
+\begin{table}[thb]
+\caption{\label{labelname} Weka experimenter algorithm with cost sensitive classifier results showing accuracy, false negative
+rate and the ROC. ZeroR being the basline for which improvement or degradation is shown.}
+\footnotesize
+{\centering \begin{tabular}{lrr@{\hspace{0.1cm}}cr@{\hspace{0.1cm}}cr@{\hspace{0.1cm}}cr@{\hspace{0.1cm}}cr@{\hspace{0.1cm}}cr@{\hspace{0.1cm}}cr@{\hspace{0.1cm}}c}
+\\
+\hline
+Algorithm & ZeroR & OneR & & NaiveBayes & & SimpleLogistic & & SMO & & IBk & & J48 & & RandomForest & \\
+\hline
+\hline
+Accuracy & 65.45 & 69.92 & $\circ$ & 81.19 & $\circ$ & 79.09 & $\circ$ & 78.47 & $\circ$ & 89.85 & $\circ$ & 86.25 & $\circ$ & 91.67 & $\circ$\\
+\hline
+False  Negative Rate & 0.00 & 0.08 & $\circ$ & 0.15 & $\circ$ & 0.07 & $\circ$ & 0.06 & $\circ$ & 0.05 & $\circ$ & 0.05 & $\circ$ & 0.03 & $\circ$\\
+\hline
+ROC & 0.50 & 0.60 & $\circ$ & 0.88 & $\circ$ & 0.90 & $\circ$ & 0.72 & $\circ$ & 0.88 & $\circ$ & 0.89 & $\circ$ & 0.98 & $\circ$\\
+\hline
+\multicolumn{16}{c}{$\circ$, $\bullet$ statistically significant improvement or degradation}\\
+\end{tabular} \footnotesize \par}
+\end{table}
+```
+
+This shows that the addition of the cost sensitivity has changed the scoring
+quite a bit. OneR performs significantly worse on all metrics, while the other
+algorithms have only changed slightly. The best performing algorithm is still
+RandomForest, but IBk is now the second best algorithm. IBk also has an excellent
+ROC value and false negative rate.
+
+----------------- spelen met setting svan IBk en RandomForest
 
 ## ZeroR
 The baseline which all other tests must surpass in accuracy. This simply shows
