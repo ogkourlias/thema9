@@ -425,7 +425,6 @@ false positives, because the outcomes for a patient are so detrimental for the l
 This is the reasoning as to why the sensitivity will be considered more in
 training a model over specificity.
 
-
 ### Data imbalance and ZeroR
 Something else which is of high importance is the data imbalance. To properly test
 the model, there needs to be more entries where the stroke class indicates "Yes".
@@ -440,12 +439,8 @@ be used to this end. SMOTE can be performed using the DMwR package.
 Another important part of properly training a model is separation between train
 and test data sets. In this case, there is only one data set present. This data set
 can be divided into two separate files, so that one may be used for training
-purposes and the other for testing purposes. An algorithm will be applied to
-the first, then the resulting model will be tested on the latter. 
-
-SMOTE may not be applied on the training data set. The data will first be divided
-and then have the sampling technique applied to the training data. 1/4th of the
-data will be used for testing, and the remaining for training.
+purposes and the other for testing purposes. It may also undergo cross-validation
+to ensure the model is not over fitting.
 
 ```{r}
 set.seed(101) 
@@ -453,6 +448,9 @@ sample = sample.split(main$stroke, SplitRatio = .75)
 train = subset(main, sample == TRUE)
 test  = subset(main, sample == FALSE)
 train <- SMOTE(stroke ~., train, perc.over = 1800, perc.under = 200)
+train[train$age > 2,]$age <- round(train[train$age > 2,]$age)
+train$bmi <- round(train$bmi, 1)
+train$avg_glucose_level <- round(train$avg_glucose_level, 2)
 table(main$stroke)
 table(train$stroke)
 ```
@@ -466,14 +464,49 @@ RWeka::write.arff(test, file = paste(path_out, "test.arff", sep = ""))
 
 Performing ZeroR on this new .arff file gives an accuracy of 65%. This is
 still an imbalance, but not as severe as before. Models may now be trained using
-different classifiers.
+different algorithms.
+
+\newpage
 
 ## 2.3. Weka Model Exploration.
 
-Following the separation and SMOTE application, all the following algorithm
-exploration will be done in the following order: The algorithm will be trained
-using the SMOTE training set. Then the test set will be the supplied test set
-in weka. The resulting accuracy will be the result of that execution.
+Following the separation and SMOTE application, the training dataset will be
+inserted into the Weka experimenter. Using cross-validation (10 folds), multiple
+different algorithms may be executed and compared. The baseline to which
+everything will be compared are the ZeroR statistics. It is of high importance
+that the algorithm is performing significantly better than ZeroR, both in 
+accuracy and false negative rate. A table showing the results of the experimenter
+will be displayed below.
+
+```{=Latex}
+\begin{table}[thb]
+\caption{\label{labelname} Weka experimenter results showing accuracy, false negative
+rate and the ROC. ZeroR being the basline for which improvement or degradation is shown.}
+\footnotesize
+{\centering \begin{tabular}{lrr@{\hspace{0.1cm}}cr@{\hspace{0.1cm}}cr@{\hspace{0.1cm}}cr@{\hspace{0.1cm}}cr@{\hspace{0.1cm}}cr@{\hspace{0.1cm}}cr@{\hspace{0.1cm}}c}
+\\
+\hline
+Algorithm & ZeroR & OneR & & NaiveBayes & & SimpleLogistic & & SMO & & IBk & & J48 & & RandomForest & \\
+\hline
+\hline
+Accuracy & 65.45 & 92.28 & $\circ$ & 80.62 & $\circ$ & 81.91 & $\circ$ & 82.38 & $\circ$ & 89.82 & $\circ$ & 88.08 & $\circ$ & 93.17 & $\circ$\\
+\hline
+False  Negative Rate & 0.00 & 0.01 & $\circ$ & 0.20 & $\circ$ & 0.13 & $\circ$ & 0.14 & $\circ$ & 0.05 & $\circ$ & 0.08 & $\circ$ & 0.04 & $\circ$\\
+\hline
+ROC & 0.50 & 0.89 & $\circ$ & 0.88 & $\circ$ & 0.90 & $\circ$ & 0.81 & $\circ$ & 0.88 & $\circ$ & 0.89 & $\circ$ & 0.98 & $\circ$\\
+\hline
+\multicolumn{16}{c}{$\circ$, $\bullet$ statistically significant improvement or degradation}\\
+\end{tabular} \footnotesize \par}
+\end{table}
+```
+
+The table shows that there are significant differences between the algorithms.
+Every algorithm will be examined and discussed, so that the best one can be found.
+All the algorithm tests were done with the default settings.
+
+## ZeroR
+The baseline which all other tests must surpass in accuracy. This simply shows
+that 65.45% of the data has "No" as classifier.
 
 ## Naive Bayes
 Applying a default Naive Bayes on the data sets provides an accuracy of 77.603%.
