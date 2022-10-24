@@ -493,7 +493,7 @@ Accuracy & 65.45 & 92.28 & $\circ$ & 80.62 & $\circ$ & 81.91 & $\circ$ & 82.38 &
 \hline
 False  Negative Rate & 0.00 & 0.01 & $\circ$ & 0.20 & $\circ$ & 0.13 & $\circ$ & 0.14 & $\circ$ & 0.05 & $\circ$ & 0.08 & $\circ$ & 0.04 & $\circ$\\
 \hline
-ROC & 0.50 & 0.89 & $\circ$ & 0.88 & $\circ$ & 0.90 & $\circ$ & 0.81 & $\circ$ & 0.88 & $\circ$ & 0.89 & $\circ$ & 0.98 & $\circ$\\
+AuROC & 0.50 & 0.89 & $\circ$ & 0.88 & $\circ$ & 0.90 & $\circ$ & 0.81 & $\circ$ & 0.88 & $\circ$ & 0.89 & $\circ$ & 0.98 & $\circ$\\
 \hline
 \multicolumn{16}{c}{$\circ$, $\bullet$ statistically significant improvement or degradation}\\
 \end{tabular} \footnotesize \par}
@@ -503,7 +503,7 @@ ROC & 0.50 & 0.89 & $\circ$ & 0.88 & $\circ$ & 0.90 & $\circ$ & 0.81 & $\circ$ &
 The table shows that there are significant differences between the algorithms.
 Every algorithm will be examined and discussed, so that the best one can be found.
 All the algorithm tests were done with the default settings. Now, considering the
-importance of false negatives, these are also displayed. The ROC value is also
+importance of false negatives, these are also displayed. The AuROC value is also
 being compared.
 
 The accuracy of the algorithms are quite close to eachother. All of them being
@@ -511,8 +511,8 @@ higher than 65.45%, the ZeroR accuracy. The lowest being NaiveBayes, at 80.62%.
 The highest scoring one is RandomForest with 93.17%. RandomForest seems to outperform
 the other algorithms except OneR on every important metric. The False negative rate
 is slightly lower for OneR, while having an accuracy difference lower than 1%.
-The ROC values do differ a bit, with RandomForest having an excellent ROC value of 0.98.
-This is 0.09 higher than the ROC value of OneR. These two algorithms are the main
+The AuROC values do differ a bit, with RandomForest having an excellent AuROC value of 0.98.
+This is 0.09 higher than the AuROC value of OneR. These two algorithms are the main
 contenders for now.
 
 Because of the importance of false negatives, another experiment will be performed.
@@ -524,7 +524,7 @@ results in the following table.
 ```{=Latex}
 \begin{table}[thb]
 \caption{\label{labelname} Weka experimenter algorithm with cost sensitive classifier results showing accuracy, false negative
-rate and the ROC. ZeroR being the basline for which improvement or degradation is shown.}
+rate and the AuROC. ZeroR being the basline for which improvement or degradation is shown.}
 \footnotesize
 {\centering \begin{tabular}{lrr@{\hspace{0.1cm}}cr@{\hspace{0.1cm}}cr@{\hspace{0.1cm}}cr@{\hspace{0.1cm}}cr@{\hspace{0.1cm}}cr@{\hspace{0.1cm}}cr@{\hspace{0.1cm}}c}
 \\
@@ -536,7 +536,7 @@ Accuracy & 65.45 & 69.92 & $\circ$ & 81.19 & $\circ$ & 79.09 & $\circ$ & 78.47 &
 \hline
 False  Negative Rate & 0.00 & 0.08 & $\circ$ & 0.15 & $\circ$ & 0.07 & $\circ$ & 0.06 & $\circ$ & 0.05 & $\circ$ & 0.05 & $\circ$ & 0.03 & $\circ$\\
 \hline
-ROC & 0.50 & 0.60 & $\circ$ & 0.88 & $\circ$ & 0.90 & $\circ$ & 0.72 & $\circ$ & 0.88 & $\circ$ & 0.89 & $\circ$ & 0.98 & $\circ$\\
+AuROC & 0.50 & 0.60 & $\circ$ & 0.88 & $\circ$ & 0.90 & $\circ$ & 0.72 & $\circ$ & 0.88 & $\circ$ & 0.89 & $\circ$ & 0.98 & $\circ$\\
 \hline
 \multicolumn{16}{c}{$\circ$, $\bullet$ statistically significant improvement or degradation}\\
 \end{tabular} \footnotesize \par}
@@ -547,46 +547,105 @@ This shows that the addition of the cost sensitivity has changed the scoring
 quite a bit. OneR performs significantly worse on all metrics, while the other
 algorithms have only changed slightly. The best performing algorithm is still
 RandomForest, but IBk is now the second best algorithm. IBk also has an excellent
-ROC value and false negative rate.
+AuROC value and false negative rate.
 
------------------ spelen met setting svan IBk en RandomForest
+It is for that reason that further experimenting will be done with those
+algorithms. Maybe some of the settings can be tweaked to get even better results.
+Individual settings will first be explored in the weka experimenter. When no better
+results can be achieved, the results will be displayed with their respective
+settings in a similar table as above, if any improvement is found.
 
-## ZeroR
-The baseline which all other tests must surpass in accuracy. This simply shows
-that 65.45% of the data has "No" as classifier.
+## IBk Distance
+None of the changes to the basic IBk or cost sensitivity settings (beside scores),
+seem to give a better result for this algorithm. Some actually providing worse ones.
+The linear nearest neighbor searching algorithm can use different distance functions,
+with the default one being euclidean. The only change here that resulted in
+a change was the usage of Manhattan distance. This made the algorithm perform 0.1%
+better than previously.
 
-## Naive Bayes
-Applying a default Naive Bayes on the data sets provides an accuracy of 77.603%.
-With 991 correctly classified instances and 286 incorrectly classified instances.
-The attribute that is being predicted for is a binary one. The application of the
-"Naive Bayes Multinominal Text" algorithm provide a higher accuracy of 95.14%.
-This is already a quite impressive result being the first of the linear classifiers.
+## IBK Nearest Neighbour Seach Algorithm
+The default value here is Linear NN search. Other algorithms did not show any
+significant improvement or degradation in the results.
 
-## K-Nearest Neighbors
-This algorithm is named as "IBk" in weka, meaning instanced based learner.
-Using the default settings on the test, an accuracy of 78.856% is reached. While
-better than the default Naive Bayes test, it is not better than the multinominal
-text variation. Changing the nearest neighbor search algorithm from the default
-linear NN search does not net any better results.
+The changing of IBk settings has not provided any significantly better results
+than the default ones. The one from the table above still being the best one.
 
-Now some decision tree algorithms will be explored.
+## Random Forest
+Changing the batch size does not result in a better or worse performing algorithm.
+It will be kept at 100. Changing the breakTiesRandomly setting from false to true,
+makes the algorithm perform 0.05% worse. Increasing the number of iterations
+decreases the performance by 0.01%, which is surprising. This will also be kept
+at the default value of 100. Changing the outputOutOfBagComplexityStatistics
+to true from false increases performance by 0.1%. This is the only performance
+increase settings could achieve.
 
-## Decision Stump
-Default execution of this algorithm nets an accuracy of 59.122%. Any alteration to
-the settings is unlikely to show a significant increase in accuracy when the
-default is already this low.
+Changing any settings for both of the algorithms seem to either decrease or only
+very slightly increase the accuracy. False negative rates were unaffected. For the
+future applications of the models, the default values will be used. These are 
+more reliable in general use cases, while changing the default settings may alter
+results too much when exposed to other instances.
 
-## J48
-This algorithm results in a 85.905% accuracy. Playing with the settings either
-gives a similar or lower accuracy. Looking at other decision tree algorithms
-will most likely provide higher accuracy.
+The random forest algorithm outperforms the IBk algorithm, even after accounting
+for changes in settings. This will be the final algorithm which will be applied
+to future instances.
 
-## Random tree
-The random tree algorithm gives a 77.291% accuracy. Changing the break ties setting
-from false to true, allows for slightly better accuracy. The result of this is 
-79.404%. Changing other settings does not provide a better accuracy.
+\newpage
 
-## Random forest
-A random forest algorithm results in 81.989% accuracy. The only t hing affecting
-the accuracy to a significant degree is the number of iterations, which gives 
-a percentage of increase in accuracy.
+## AuROC
+As mentioned earlier, the ROC value for the RandomForest algorithm is very good,
+sitting at 0.98. This can be plotted and shown using the RWeka package to load
+in the curves from the Weka visualizer.
+
+```{r roc_curve, fig.cap="Area under the Curve for ROC of the Final Random Forest Algorithm"}
+roc <- RWeka::read.arff("../data/roc_yes.arff")
+roc_curve <- (roc$`True Positive Rate` ~ roc$`False Positive Rate`)
+ggplot(roc, aes(x=`False Positive Rate`, y=`True Positive Rate`)) +
+  geom_area(position = "identity", fill = "cadetblue") +
+  ggtitle("Area Under the Curve for ROC of Random Forest") +
+  theme(plot.title = element_text(hjust = 0.5))
+```
+
+This shows that the area under the curve for the ROC value of 0.98 is quite big.
+
+\newpage
+
+## Learning Curve of Random Forest
+Another interesting metric to plot would be the learing curve throughout the 
+algorithm. This can show at which amount of entries the algorithm is nearing its
+full potential in correct classification.
+
+A table will be generated, showing the learning curve as the bag size percentage
+of the random forest increases. The metric being shown is the error rate, as the
+bag size percentage increases in increments of 10, from 10 till 100.
+```{=Latex}
+\begin{table}[thb]
+\caption{\label{labelname}Error rate for bag size percentages of the final random forest algorithm.}
+\footnotesize
+{\centering \begin{tabular}{lrr@{\hspace{0.1cm}}cr@{\hspace{0.1cm}}cr@{\hspace{0.1cm}}cr@{\hspace{0.1cm}}cr@{\hspace{0.1cm}}cr@{\hspace{0.1cm}}cr@{\hspace{0.1cm}}cr@{\hspace{0.1cm}}cr@{\hspace{0.1cm}}c}
+\\
+\hline
+Bag Size Percentage & 10 & 20 & & 30 & & 40 & & 50 & & 60 & & 70 & & 80 & & 90 & & 100\\
+\hline
+Error Rate & 15.55 & 13.46 & $\bullet$ & 12.04 & $\bullet$ & 11.02 & $\bullet$ & 10.11 & $\bullet$ & 9.55 & $\bullet$ & 9.13 & $\bullet$ & 8.81 & $\bullet$ & 8.49 & $\bullet$ & 8.33 & $\bullet$\\
+\hline
+\multicolumn{20}{c}{$\circ$, $\bullet$ statistically significant improvement or degradation}\\
+\end{tabular} \footnotesize \par}
+\end{table}
+```
+
+The error rate seems to decrease after every jump, with the slope also becoming
+smaller every time. This can be plotted too, so the slope may be easier to observe.
+
+```{r learning_curve, fig.cap="Learning curve as bag size percentage increases of the final random forest algorithm."}
+percentage <- seq(10, 100, by=10)
+er <- c(15.55,13.46,12.04,11.02,10.11,9.55,9.13,8.81,8.49,8.33)
+learning <- data.frame(percentage, er)
+
+ggplot(learning, aes(x=percentage, y=er)) +
+  geom_line(colour = "cadetblue") +
+  ggtitle("Learning curve for bag size percentage.") +
+  theme(plot.title = element_text(hjust = 0.5)) +
+  ylab("Error Rate") +
+  xlab("Bag Size Percentage")
+```
+

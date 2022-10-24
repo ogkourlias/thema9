@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.141592653-2.6-1.40.24 (TeX Live 2022) (preloaded format=pdflatex 2022.10.23)  23 OCT 2022 19:12
+This is pdfTeX, Version 3.141592653-2.6-1.40.24 (TeX Live 2022) (preloaded format=pdflatex 2022.10.24)  24 OCT 2022 18:02
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -389,6 +389,9 @@ File: l3backend-pdftex.def 2022-09-28 L3 backend support: PDF output (pdfTeX)
 
 LaTeX Warning: Label `labelname' multiply defined.
 
+
+LaTeX Warning: Label `labelname' multiply defined.
+
 )
 \openout1 = `journal.aux'.
 
@@ -491,25 +494,25 @@ LaTeX Font Info:    Trying to load font information for T1+lmtt on input line 14
 (c:/Users/orfeas/AppData/Roaming/TinyTeX/texmf-dist/tex/latex/lm/t1lmtt.fd
 File: t1lmtt.fd 2015/05/01 v1.6.1 Font defs for Latin Modern
 ) [2] [3] [4] [5] [6] [7]
-<journal_files/figure-latex/age_by_stroke-1.pdf, id=182, 469.755pt x 325.215pt>
+<journal_files/figure-latex/age_by_stroke-1.pdf, id=174, 469.755pt x 325.215pt>
 File: journal_files/figure-latex/age_by_stroke-1.pdf Graphic file (type pdf)
 <use journal_files/figure-latex/age_by_stroke-1.pdf>
 Package pdftex.def Info: journal_files/figure-latex/age_by_stroke-1.pdf  used on input line 514.
 (pdftex.def)             Requested size: 469.75386pt x 325.2142pt.
 [8 <./journal_files/figure-latex/age_by_stroke-1.pdf>] [9]
-<journal_files/figure-latex/marriage_and_stroke-1.pdf, id=198, 469.755pt x 325.215pt>
+<journal_files/figure-latex/marriage_and_stroke-1.pdf, id=190, 469.755pt x 325.215pt>
 File: journal_files/figure-latex/marriage_and_stroke-1.pdf Graphic file (type pdf)
 <use journal_files/figure-latex/marriage_and_stroke-1.pdf>
 Package pdftex.def Info: journal_files/figure-latex/marriage_and_stroke-1.pdf  used on input line 601.
 (pdftex.def)             Requested size: 469.75386pt x 325.2142pt.
 [10 <./journal_files/figure-latex/marriage_and_stroke-1.pdf>]
-<journal_files/figure-latex/heart_and_stroke-1.pdf, id=210, 469.755pt x 325.215pt>
+<journal_files/figure-latex/heart_and_stroke-1.pdf, id=202, 469.755pt x 325.215pt>
 File: journal_files/figure-latex/heart_and_stroke-1.pdf Graphic file (type pdf)
 <use journal_files/figure-latex/heart_and_stroke-1.pdf>
 Package pdftex.def Info: journal_files/figure-latex/heart_and_stroke-1.pdf  used on input line 639.
 (pdftex.def)             Requested size: 469.75386pt x 325.2142pt.
 [11 <./journal_files/figure-latex/heart_and_stroke-1.pdf>] [12]
-<journal_files/figure-latex/bmi_by_stroke-1.pdf, id=226, 469.755pt x 325.215pt>
+<journal_files/figure-latex/bmi_by_stroke-1.pdf, id=218, 469.755pt x 325.215pt>
 File: journal_files/figure-latex/bmi_by_stroke-1.pdf Graphic file (type pdf)
 <use journal_files/figure-latex/bmi_by_stroke-1.pdf>
 Package pdftex.def Info: journal_files/figure-latex/bmi_by_stroke-1.pdf  used on input line 708.
@@ -527,26 +530,36 @@ Overfull \hbox (14.8511pt too wide) in paragraph at lines 935--948
  [][] 
  []
 
-[17] [18] (./journal.aux)
+[17] [18]
+LaTeX Font Info:    Trying to load font information for TS1+lmtt on input line 1022.
+(c:/Users/orfeas/AppData/Roaming/TinyTeX/texmf-dist/tex/latex/lm/ts1lmtt.fd
+File: ts1lmtt.fd 2015/05/01 v1.6.1 Font defs for Latin Modern
+)
+<journal_files/figure-latex/roc_curve-1.pdf, id=264, 469.755pt x 325.215pt>
+File: journal_files/figure-latex/roc_curve-1.pdf Graphic file (type pdf)
+<use journal_files/figure-latex/roc_curve-1.pdf>
+Package pdftex.def Info: journal_files/figure-latex/roc_curve-1.pdf  used on input line 1032.
+(pdftex.def)             Requested size: 469.75386pt x 325.2142pt.
+[19 <./journal_files/figure-latex/roc_curve-1.pdf>] [20] (./journal.aux)
 
 LaTeX Warning: There were multiply-defined labels.
 
 Package rerunfilecheck Info: File `journal.out' has not changed.
-(rerunfilecheck)             Checksum: 6BE0DD427D1D701468288F30754839CB;4000.
+(rerunfilecheck)             Checksum: 78F4B8FA34E2E6DB492B37D8C16DF073;4011.
  ) 
 Here is how much of TeX's memory you used:
- 11858 strings out of 477031
- 187018 string characters out of 5826550
- 541021 words of memory out of 5000000
- 32724 multiletter control sequences out of 15000+600000
- 509823 words of font info for 58 fonts, out of 8000000 for 9000
+ 11899 strings out of 477031
+ 188043 string characters out of 5826550
+ 540859 words of memory out of 5000000
+ 32760 multiletter control sequences out of 15000+600000
+ 510128 words of font info for 59 fonts, out of 8000000 for 9000
  14 hyphenation exceptions out of 8191
- 72i,9n,77p,377b,461s stack positions out of 10000i,1000n,20000p,200000b,200000s
-{c:/Users/orfeas/AppData/Roaming/TinyTeX/texmf-dist/fonts/enc/dvips/lm/lm-mathsy.enc}{c:/Users/orfeas/AppData/Roaming/TinyTeX/texmf-dist/fonts/enc/dvips/lm/lm-ec.enc}<c:/Users/orfeas/AppData/Roaming/TinyTeX/texmf-dist/fonts/type1/public/lm/lmbx10.pfb><c:/Users/orfeas/AppData/Roaming/TinyTeX/texmf-dist/fonts/type1/public/lm/lmbx12.pfb><c:/Users/orfeas/AppData/Roaming/TinyTeX/texmf-dist/fonts/type1/public/lm/lmr10.pfb><c:/Users/orfeas/AppData/Roaming/TinyTeX/texmf-dist/fonts/type1/public/lm/lmr12.pfb><c:/Users/orfeas/AppData/Roaming/TinyTeX/texmf-dist/fonts/type1/public/lm/lmr17.pfb><c:/Users/orfeas/AppData/Roaming/TinyTeX/texmf-dist/fonts/type1/public/lm/lmr8.pfb><c:/Users/orfeas/AppData/Roaming/TinyTeX/texmf-dist/fonts/type1/public/lm/lmsy8.pfb><c:/Users/orfeas/AppData/Roaming/TinyTeX/texmf-dist/fonts/type1/public/lm/lmtt10.pfb>
-Output written on journal.pdf (18 pages, 263815 bytes).
+ 72i,9n,77p,449b,461s stack positions out of 10000i,1000n,20000p,200000b,200000s
+{c:/Users/orfeas/AppData/Roaming/TinyTeX/texmf-dist/fonts/enc/dvips/lm/lm-ts1.enc}{c:/Users/orfeas/AppData/Roaming/TinyTeX/texmf-dist/fonts/enc/dvips/lm/lm-mathsy.enc}{c:/Users/orfeas/AppData/Roaming/TinyTeX/texmf-dist/fonts/enc/dvips/lm/lm-ec.enc}<c:/Users/orfeas/AppData/Roaming/TinyTeX/texmf-dist/fonts/type1/public/lm/lmbx10.pfb><c:/Users/orfeas/AppData/Roaming/TinyTeX/texmf-dist/fonts/type1/public/lm/lmbx12.pfb><c:/Users/orfeas/AppData/Roaming/TinyTeX/texmf-dist/fonts/type1/public/lm/lmr10.pfb><c:/Users/orfeas/AppData/Roaming/TinyTeX/texmf-dist/fonts/type1/public/lm/lmr12.pfb><c:/Users/orfeas/AppData/Roaming/TinyTeX/texmf-dist/fonts/type1/public/lm/lmr17.pfb><c:/Users/orfeas/AppData/Roaming/TinyTeX/texmf-dist/fonts/type1/public/lm/lmr8.pfb><c:/Users/orfeas/AppData/Roaming/TinyTeX/texmf-dist/fonts/type1/public/lm/lmsy8.pfb><c:/Users/orfeas/AppData/Roaming/TinyTeX/texmf-dist/fonts/type1/public/lm/lmtt10.pfb>
+Output written on journal.pdf (20 pages, 279848 bytes).
 PDF statistics:
- 335 PDF objects out of 1000 (max. 8388607)
- 288 compressed objects within 3 object streams
+ 346 PDF objects out of 1000 (max. 8388607)
+ 294 compressed objects within 3 object streams
  88 named destinations out of 1000 (max. 500000)
- 269 words of extra memory for PDF output out of 10000 (max. 10000000)
+ 258 words of extra memory for PDF output out of 10000 (max. 10000000)
 
