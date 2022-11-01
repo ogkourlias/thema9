@@ -3,6 +3,6 @@ old/
 
 java/requirements.txt
 java/wrapper/.idea/
-java/wrapper/build/
+java/wrapper/build/*
 java/wrapper/.gradle/*
 .idea/
