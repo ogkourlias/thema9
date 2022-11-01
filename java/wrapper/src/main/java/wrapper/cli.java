@@ -2,26 +2,22 @@ package wrapper;
 import org.apache.commons.cli.*;
 
 public class cli {
-    public static void main(String[] args) throws ParseException {
-        init(args);
-    }
-
-    public static void init(String[] args) throws ParseException {
+    public static String init(String[] args) throws ParseException {
         // create Options object
         Options options = new Options();
 
-        // add t option
-        options.addOption("t", false, "display current time");
+        // add f option
+        options.addOption("f", true, "Indicate file path");
 
         CommandLineParser parser = new DefaultParser();
         CommandLine cmd = parser.parse(options, args);
 
-        if(cmd.hasOption("t")) {
-            System.out.println("time");
+        if(cmd.hasOption("f")) {
+            return cmd.getOptionValue("f");
         }
         else {
-            System.out.println("no");
+            System.out.println("Please provide -f {file_path}");
         }
+        return null;
     }
-
 }

@@ -3,6 +3,7 @@ import org.apache.commons.cli.*;
 
 public class Main {
     public static void main(String[] args) throws ParseException {
-        cli.main(args);
+        String file = cli.init(args);
+        System.out.println(file);
     }
 }
