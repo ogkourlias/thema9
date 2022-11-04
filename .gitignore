@@ -1,8 +1,9 @@
 .Rhistory
 old/
+.idea/
 
 java/requirements.txt
 java/wrapper/.idea/
 java/wrapper/build/*
-java/wrapper/.gradle/*
-.idea/
+java/wrapper/.gradle/
+java/wrapper/gradle
