@@ -7,3 +7,5 @@ java/wrapper/.idea/
 java/wrapper/build/*
 java/wrapper/.gradle/
 java/wrapper/gradle
+java/wrapper/wrapper.iml
+java/wrapper/new.arff
