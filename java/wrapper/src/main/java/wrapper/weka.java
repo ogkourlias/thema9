@@ -10,11 +10,11 @@ import java.io.*;
 public class weka {
 
     static void runWeka(String newFile) throws Exception {
-        Instances trainData = readArff("wrapper/build/resources/main/train.arff");
+        //Instances trainData = readArff("wrapper/build/resources/main/train.arff");
         Instances newData = readArff(newFile);
         CostSensitiveClassifier rf = new CostSensitiveClassifier();
         rf = (CostSensitiveClassifier) SerializationHelper.read("wrapper/src/main/resources/rforest.model");
-
+        classifyNewInstance(rf, newData);
     }
 
     private static Instances readArff(String handle) throws Exception {
@@ -24,5 +24,16 @@ public class weka {
         Instances data = arff.getData();
         data.setClassIndex(data.numAttributes() - 1);
         return data;
+    }
+
+    private static void classifyNewInstance(CostSensitiveClassifier rf, Instances newData) throws Exception {
+        // create copy
+        Instances labeled = new Instances(newData);
+        // label instances
+        for (int i = 0; i < newData.numInstances(); i++) {
+            double clsLabel = rf.classifyInstance(newData.instance(i));
+            labeled.instance(i).setClassValue(clsLabel);
+        }
+        System.out.println("\nNew, labeled = \n" + labeled);
     }
 }

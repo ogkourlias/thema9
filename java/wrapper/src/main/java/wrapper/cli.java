@@ -8,6 +8,7 @@ public class cli {
 
         // add f option
         options.addOption("f", true, "Indicate file path");
+        options.addOption("o", true, "Indicate output path");
 
         CommandLineParser parser = new DefaultParser();
         CommandLine cmd = parser.parse(options, args);
