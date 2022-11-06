@@ -1,6 +1,6 @@
 ---
-title: "Given 10 attributes, how do they compare in predicting the chances of a person's risk of a stroke?"
-author: "Orfeas Gkourlias"
+title: "What is the most accurate model in predicting the stroke risk of a person given 10 attributes."
+author: "Orfeas Gkourlias - 420172"
 date: "`r Sys.Date()`"
 output: pdf_document
 ---
@@ -28,8 +28,75 @@ ratio2 <- as.vector(table(stroke$heart_disease)[2])/nrow(stroke)
 ```
 \newpage
 
+\section{Preface}
+The project and paper were written for an assignment given by Hanzehogeschool
+Groningen. With the educational goal of providing a learning experience regarding
+machine learning and some Java. We were given the opportunity to choose any
+data set to our liking for the project, adhering to the requirements set, of course.
+
+This made it so that the entire experience was more interesting, because of the 
+agency in choosing something that interested me. Sadly, the first data set I had
+chosen did not meet the requirements, resulting in me lagging behind for a little while.
+Luckily, I was able to catch up with another interesting subject, concerning stroke patients. 
+This subject intrigues me tremendously, because of people in my environment who 
+have had the misfortune of suffering a stroke. Considering the ever growing importance
+and emphasizes on preventative care, and the significance of strokes on people, 
+I thought this would be a perfect candidate for the machine learning project.
+I would like to thank my teachers for the guidance they offered in execution of the 
+project.
+
+\newpage
+
+\section{Abstract}
+Every 40 seconds someone in the united states suffers from a stroke. With around
+1 out of 5 people passing away as a result. The outlook for stroke patients are
+also varying in severity for the survivors. With extensive aftercare almost being
+a guarantee in all cases, strokes are also the leading cause of serious, long-term
+disabilities and impairments. With only 1 out of 10 patients making a full recovery.
+
+The severity and prevalence of strokes cannot be understated. While modern aftercare
+usually provides favorable prognosis, the complete prevention of not only strokes, but
+many cardiovascular conditions has long been advocated for. The importance of preventative
+healthcare keeps being re-emphasized as people grow older. There are many preventative
+measures available and still being developed.
+
+Considering the above, the ability to predict whether someone may suffer from a stroke
+would be an invaluable tool. This project has aimed to do just that. By taking
+patient data, examining that and then training a machine learning model to make
+predictions based off it. Using the powerful machine-learning and data analysis
+program called Weka, a prediction model was developed and trained to be 92 percent
+accurate in its classification. With emphasis on avoiding false negatives, the
+model will be identify high risk patients with utmost care.
+
+If this model could be made even more accurate, then it might serve as a primary
+detector of high risk stroke patients. Although a wide array of different 
+methodologies and algorithms were tried, there might still be facets of the 
+project which could have been done differently. Further examination of the model
+would maybe be able to push it past even the 95 percent accuracy mark.
+
+To compliment the model, a java program was also developed. This program takes the 
+model, new instances of data with similar structure, and makes a prediction
+on all of the instances. This way many entries from big data-sets can be classified
+at once.
+
+\newpage
+
+\section{Abbreviations}
+
+\newpage
+
+\section{Table of Contents}
+
+\newpage
+
+\section{Introduction}
+
+\newpage
+
+\section{Materials and methods}
+
 \section{Results}
-Following the analysis of the dataset and the attributes within, some important
+Following the analysis of the data set and the attributes within, some important
 correlations can be observed. Correlations relevant to the research question
 mostly consist of heart and health attributes. The first plot regarding heart d
 isease differences in non-stroke and stroke patients will be shown.
@@ -120,7 +187,7 @@ changed in this case.
 
 \newpage
 
-# Discussion
+\section{Discussion and Conclusion}
 Now that the most important results have been shown, some points of contention
 could be considered. The aim of this project is to answer the original research
 question using machine learning. This may be done with varying algorithms and 
@@ -140,3 +207,11 @@ generate synthetic data points, so that the absence of balance will be remedied.
 Whether this should be remedied might also be debatable. Some may argue that the
 raw data ratio would be an accurate representation. But considering that the 
 difference is this extreme, SMOTE was chosen regardless.
+
+\newpage
+
+\section{References}
+
+\newpage
+
+\section{Appendices}
