@@ -1,20 +1,22 @@
 package wrapper;
 
+// Weka API.
 import weka.classifiers.meta.CostSensitiveClassifier;
 import weka.core.Instances;
 import weka.core.SerializationHelper;
 import weka.core.converters.ArffLoader;
+import weka.core.converters.ArffSaver;
 
+// Java Imports.
 import java.io.*;
 
 public class weka {
 
-    static void runWeka(String newFile) throws Exception {
-        //Instances trainData = readArff("wrapper/build/resources/main/train.arff");
+    static void runWeka(String newFile, String outFile) throws Exception {
         Instances newData = readArff(newFile);
         CostSensitiveClassifier rf = new CostSensitiveClassifier();
         rf = (CostSensitiveClassifier) SerializationHelper.read("wrapper/src/main/resources/rforest.model");
-        classifyNewInstance(rf, newData);
+        classifyNewInstance(rf, newData, outFile);
     }
 
     private static Instances readArff(String handle) throws Exception {
@@ -26,7 +28,7 @@ public class weka {
         return data;
     }
 
-    private static void classifyNewInstance(CostSensitiveClassifier rf, Instances newData) throws Exception {
+    private static void classifyNewInstance(CostSensitiveClassifier rf, Instances newData, String outFile) throws Exception {
         // create copy
         Instances labeled = new Instances(newData);
         // label instances
@@ -34,6 +36,9 @@ public class weka {
             double clsLabel = rf.classifyInstance(newData.instance(i));
             labeled.instance(i).setClassValue(clsLabel);
         }
-        System.out.println("\nNew, labeled = \n" + labeled);
+        ArffSaver saver = new ArffSaver();
+        saver.setInstances(labeled);
+        saver.setFile(new File(outFile));
+        saver.writeBatch();
     }
 }

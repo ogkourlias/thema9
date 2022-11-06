@@ -3,7 +3,9 @@ import org.apache.commons.cli.*;
 
 public class Main {
     public static void main(String[] args) throws Exception {
-        String file = cli.init(args);
-        weka.runWeka(file);
+        CommandLine mainCli = cli.init(args);
+        String file = mainCli.getOptionValue("f");
+        String outFile = mainCli.getOptionValue("o");
+        weka.runWeka(file, outFile);
     }
 }
