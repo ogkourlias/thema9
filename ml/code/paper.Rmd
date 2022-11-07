@@ -2,7 +2,11 @@
 title: "What is the most accurate model in predicting the stroke risk of a person given 10 attributes."
 author: "Orfeas Gkourlias - 420172"
 date: "`r Sys.Date()`"
-output: pdf_document
+output: 
+  pdf_document:
+    toc: no
+    toc_depth: 2
+    number_sections: true
 ---
 
 ```{r setup, include=FALSE}
@@ -82,15 +86,83 @@ at once.
 \newpage
 
 \section{Abbreviations}
-
+SMOTE : Synthetic Minority Oversampling Technique
+BMI : BOdy mass index
 \newpage
 
 \section{Table of Contents}
-
+```{=latex}
+\setcounter{tocdepth}{4}
+\tableofcontents
+```
 \newpage
 
 \section{Introduction}
+Stroke is one of the leading causes of death and disability worldwide, ranking
+at second for amount of deaths and third for death and disabilities combined
+[World Stroke Organization (WSO): Global Stroke Fact Sheet 2022](https://pubmed.ncbi.nlm.nih.gov/34986727/).
+The best solution to this worldwide problem will be preventative care. As high
+as 80% of all the stroke cases are preventable ones. [Preventing Stroke Deaths](https://www.cdc.gov/vitalsigns/pdf/2017-09-vitalsigns.pdf)
+The correlation between stroke risk and attributes such as BMI and blood pressure
+are already well observed. These metrics are useful in predicting a person's likelihood 
+of suffering from a stroke. While this may be done on an individual basis, a computer 
+could in theory also make these predictions, given the required metrics. This is 
+where machine learning and statistical inference could be paramount in preventative care.
+The total amount of stroke patients may be reduced significantly,by applying a 
+machine learning model and predicting for multiple people whether they are at risk
+of suffering from a stroke.
 
+## Objective
+The objective of this project is to develop and train a model, which can accurately
+predict whether a person is likely to suffer from a stroke. This can be achieved
+using machine learning algorithms, which are already present in the program named
+[Weka](https://www.cs.waikato.ac.nz/ml/weka/). This final model may then be used
+in a Java program, which predicts for every given person whether they are
+likely to suffer from a stroke.
+
+## Theory
+As mentioned before, preventing strokes will be the most efficient way to combat
+them. This can be done in many ways, but detecting that on a large scale is already
+quite an undertaking. Doctors can already provide sufficient diagnosis of attributes
+such as elevated blood pressures and increased BMIs. But to do this for every
+single individual would require too many people. Patients are often already unaware
+of elevated blood pressures, hence why it is called a silent killer. Application of
+a machine learning model allows for the diagnosis process to be applied on a greater
+scale. Taking thousands of patient and predicting their individual risks is faster
+and more efficient.
+
+Machine learning can be a complicated process, with many different ways of
+approaching the training of a model. First training data needs to be collected.
+In this case, data was taken from [kaggle](https://www.kaggle.com/datasets/fedesoriano/stroke-prediction-dataset?resource=download).
+This data contains 12 attributes, with one being the classifier: stroke history.
+5110 instances are present in the main dataset.
+
+```{r, echo=F}
+knitr::kable(codebook)
+```
+Some of the attributes can directly be identified as correlated to an increased
+risk of having a stroke. Other attributes are less obvious contenders,
+such as the marriage status. The last attribute is the one for which will be
+predicted. In this case, it is a binary classification, with stroke either indicating
+yes or no. This was an important consideration when choosing an algorithm, because
+not every algorithm is as effective as another when it comes to classification
+problems. The accuracy, meaning how many of the instances a model predicts correctly
+is of high importance. Something else which was closely examined was the false
+negative rate. This rate must be as low as possible without compromising much
+of the accuracy, because false negatives are more destructive to a person than
+a false positive in this case. The ROC curve was therefore also an important facet
+of the end result. 
+
+While the data itself is of good quality, there was one concern to be had. The
+classifier was quite uneven in distribution. With 95% of the instances being 
+classified as no, with the remaining 5% being a no. While maybe realistic, it would
+skew the final model too much, resulting in a lower accuracy. Bringing the balance
+closer to 70/30 would be better for training purposes. To achieve this, the
+synthetic minority oversampling technique (SMOTE) was used. As the technique implies,
+it increases the number of total cases in a balanced way.
+
+The final data is then prepared for model training, which as mentioned before
+will be aimed at increasing the accuracy while reducing the false negative rate.
 \newpage
 
 \section{Materials and methods}
@@ -98,8 +170,8 @@ at once.
 \section{Results}
 Following the analysis of the data set and the attributes within, some important
 correlations can be observed. Correlations relevant to the research question
-mostly consist of heart and health attributes. The first plot regarding heart d
-isease differences in non-stroke and stroke patients will be shown.
+mostly consist of heart and health attributes. The first plot regarding heart
+disease differences in non-stroke and stroke patients will be shown.
 
 ```{r, echo=F}
 barplot(vec, space = c(0,0,1,0), col = c("brown4", "cadetblue"), 
