@@ -166,6 +166,29 @@ will be aimed at increasing the accuracy while reducing the false negative rate.
 \newpage
 
 \section{Materials and methods}
+The entirety of this project, including both the machine learning and java part
+, was developed in a [github repository.](https://github.com/ogkourlias/thema9)
+The ml directory contains the machine learning section, with the java directory
+containing the entire java program. This project was also performed by one student.
+
+## Material
+The project consists of multiple programs and tools. The versions of the software
+and tools are important, especially in the case of the java program. A table
+will be shown with all the software which was used.
+
+```{=latex}
+\begin{table}[thb]
+\begin{tabular}{|l|l|l|}
+\hline
+\textbf{Software} & \textbf{Version} & \textbf{Function}                \\ \hline
+R                 & 4.2.1            & Statistical analysis language    \\ \hline
+Weka              & 3.8.6            & Machine learning platform        \\ \hline
+Java              & 17.0.5           & Application programming language \\ \hline
+Gradle            & 7.4              & Application builder              \\ \hline
+\end{tabular}
+\end{table}
+```
+
 
 \section{Results}
 Following the analysis of the data set and the attributes within, some important
