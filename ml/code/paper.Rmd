@@ -1,5 +1,5 @@
 ---
-title: "What is the most accurate model in predicting the stroke risk of a person given 10 attributes."
+title: "How accurate can a machine learning model be in predicting whether someone may expereince a stroke?"
 author: "Orfeas Gkourlias - 420172"
 date: "`r Sys.Date()`"
 output: 
@@ -7,6 +7,7 @@ output:
     toc: no
     toc_depth: 2
     number_sections: true
+  urlcolor: blue
 ---
 
 ```{r setup, include=FALSE}
@@ -137,9 +138,11 @@ In this case, data was taken from [kaggle](https://www.kaggle.com/datasets/fedes
 This data contains 12 attributes, with one being the classifier: stroke history.
 5110 instances are present in the main dataset.
 
-```{r, echo=F}
+```{r, echo=F, fig.cap="Codebook"}
 knitr::kable(codebook)
 ```
+
+\newpage
 Some of the attributes can directly be identified as correlated to an increased
 risk of having a stroke. Other attributes are less obvious contenders,
 such as the marriage status. The last attribute is the one for which will be
@@ -176,27 +179,118 @@ The project consists of multiple programs and tools. The versions of the softwar
 and tools are important, especially in the case of the java program. A table
 will be shown with all the software which was used.
 
-```{=latex}
-\begin{table}[thb]
-\begin{tabular}{|l|l|l|}
-\hline
-\textbf{Software} & \textbf{Version} & \textbf{Function}                \\ \hline
-R                 & 4.2.1            & Statistical analysis language    \\ \hline
-Weka              & 3.8.6            & Machine learning platform        \\ \hline
-Java              & 17.0.5           & Application programming language \\ \hline
-Gradle            & 7.4              & Application builder              \\ \hline
-\end{tabular}
-\end{table}
-```
+| Software | Version | Function                         |
+|----------|---------|----------------------------------|
+| R        | 4.2.1   | Statistical analysis language.   |
+| Weka     | 3.8.6   | Machine learning platform.       |
+| Java     | 17.0.5  | Application programming language.|
+| Gradle   | 7.4     | Application builder.             |
 
+The R and Java software also require specific packages.
+Packages required for R are as following.
+
+| R Package | Version | Function                    |
+|-----------|---------|-----------------------------|
+| readr     | 2.1.2   | Read rectangular text data. |
+| ggplot2   | 3.3.6   | Creating visualizations.    |
+| tidyr     | 1.2.1   | Tidy messy data.            |
+| lemon     | 0.4.5   | Ggplot2 exstension.         |
+| Rweka     | 0.4-44  | Weka interface for R.       |
+| DMwR      | 0.4.1   | Functions for data mining.  |
+| Hmisc     | 4.7-1   | Harrell miscellaneous.      |
+| caTools   | 1.18.2  | Statistical tools.          |
+
+Followed by the Java packages used in development.
+
+| Java Package       | Version | Function           |
+|--------------------|---------|--------------------|
+| Weka               | 3.8.0   | Weka API for Java. |
+| Apache Commons Cli | 1.5.0   | CLI Api for Java.  |
+
+A unix based system is recommended in combination with the above software.
+
+## Data
+The data set was taken from [kaggle](https://www.kaggle.com/datasets/fedesoriano/stroke-prediction-dataset?resource=download).
+It can be downloaded in a .csv format. The file itself has been renamed to stroke-data.csv.
+The theory behind the attributes from the dataset is explained in the theory section.
+
+\newpage
+
+## Methodology
+This project consists of multiple methods which had been developed prior. The data
+pre-processing contains SMOTE, which is a widely used technique for imbalanced data.
+The remaining pre-processing operations were done with R and the aforementioned
+packages. The data was already very usable on its own. The only thing performed
+besides SMOTE for cleaning purposes was the deletion of the ID column. This was
+not relevant for the algorithm training.
+
+The order in which things were done as follows. First, the data was downloaded
+from the kaggle link. The data was then loaded into the journal.rmd file. EDA was
+first performed in this file. The results can be found in the corresponding journal.pdf
+file. Statistical analysis was done with standard t-tests and functions from the base R 
+language. The analysis was done to find correlations in attributes before the data
+would be used in Weka.
+
+After the analysis and pre-processing steps, Weka comes into play for the machine
+learning section. The new cleaned up data (train.arff) was loaded into the weka
+program. First, with the explorer to individually test different algorithms. The
+algorithms themselves are all built into the Weka program. The explorer was used
+in the program to get a feel for what might be feasible and what might not be. All
+algorithm tests in this and the following steps were done with 10-fold cross validation.
+
+After deducing the most likely algorithm candidates from the explorer, they were
+all ready to be tested against each other. This was done in the weka experimenter.
+The weka experimenter allows for multiple algorithms to be selected at once, so
+that they may be tested and compared with eachother. This was done with the following
+algorithms: ZeroR, OneR, NaiveBayes, SimpleLogistic, SMO, IBk, J48 and RandomForest.
+This was done with default settings, with ZeroR being the comparison baseline.
+Because of the importance of false negatives, all the above algorithms were
+tested again but with cost sensitivity. The scoring matrix being:
+
+| 0 | 2 |
+|---|---|
+| 1 | 0 |
+
+Which indicates that the false negatives will be weighted more than the other
+hits.
+
+Once the best two algorithsm were found, that being OneR and RandomForest, they were
+once again compared in the experimenter. But this time with differing settings. 
+Every default setting was changed from 0 to 1 in turn. The results were underwhelming,
+and the default settings were therefore retained after examination. This resulted
+ina model with 92% accuracy, with usage of the RandomForest algorithm. This model
+was exported to a .model file, which can be found in resources under the java
+directory.
+
+## Java
+The java program was developed with the intent of allowing for new classifications,
+using the model from the last step. This model can be loaded into java with the
+Weka api. The weka Api contains functions which can both read and write to .arff files.
+Once the user input was taken as a .arff file with the Apache api, the classification 
+of new instances was performed by loading the .model file with the Weka api and 
+that. The output of this process is saved in a new .arff file, with the new
+classifications for every row/instance. 
+
+The java program was built using gradle and the shadow plugin. The shadow plugin
+allows for building of fatjars, which don't require the user to have downloaded
+the dependencies beforehand. The entirety of the program can be found under
+the java/wrapper directory path.
+
+\newpage
 
 \section{Results}
+The results of the project will be shown here, with the following structure.
+First the data exploration and its results will be explained and shown. Following that,
+the results from the machine learning and model training will be displayed. Ending
+with a display of the final java program which allows for new classifications.
+
+## Data Analysis
 Following the analysis of the data set and the attributes within, some important
 correlations can be observed. Correlations relevant to the research question
 mostly consist of heart and health attributes. The first plot regarding heart
 disease differences in non-stroke and stroke patients will be shown.
 
-```{r, echo=F}
+```{r, echo=F, out.height="80%", fig.cap="Barplot of heart disease status by stroke history."}
 barplot(vec, space = c(0,0,1,0), col = c("brown4", "cadetblue"), 
         names.arg = c("                       No Stroke","",
                       "                       Stroke",""), ylab = "Log(Occurance)",
@@ -215,13 +309,14 @@ likely for someone who has had a stroke, to also have a heart condition.
 The literature on this subject seems to have come to a common consensus: There is
 a correlation between having a heart disease and a higher risk of a stroke, This 
 paper published by the American Heart Association being one of the bigger
-published works on the topic: [Heart Disease and Stroke Statistics—2020 Update: A Report From the American Heart Association](https://www.ahajournals.org/doi/full/10.1161/CIR.0000000000000757?rfr_dat=cr_pub++0pubmed&url_ver=Z39.88-2003&rfr_id=ori%3Arid%3Acrossref.org)
-(Keep in mind, the risk of developing heart disease AFTER  a stroke is also quite big.)
+published works on the topic: [Heart Disease and Stroke Statistics—2020 Update: A Report From the American Heart Association](https://www.ahajournals.org/doi/full/10.1161/CIR.0000000000000757?rfr_dat=cr_pub++0pubmed&url_ver=Z39.88-2003&rfr_id=ori%3Arid%3Acrossref.org). Keep in mind, the risk of developing heart disease after stroke is also quite high.
+
+\newpage
 
 The same can be seen in the case of hypertension, because that is also
 a heart condition.
 
-```{r, echo=F}
+```{r, echo=F, out.height="90%", fig.cap="Barplot of hypertension status by stroke history."}
 no_s_table <- log(table(no_stroke$hypertension))
 s_table <- log(table(stroke$hypertension))
 
@@ -230,10 +325,11 @@ vec <- c(no_s_table[1], no_s_table[2], s_table[1], s_table[2])
 barplot(vec, space = c(0,0,1,0), col = c("brown4", "cadetblue"), 
         names.arg = c("                       No Stroke","",
                       "                       Stroke",""), ylab = "Log(Occurance)",
-        main = "Heart disease status by stroke history")
+        main = "Hypertension status by stroke history")
 legend("topright", c("No Hypertension", "Hypertension"),
        fill = c("brown4", "cadetblue"))
 ```
+
 This plot is very similar to the prior one. That makes sense, because quite some
 heart conditions are accompanied by hypertension. Hypertension on its own
 is already classified as a heart condition too.
@@ -245,44 +341,101 @@ attributes, such as hypertension or heart conditions. According to this paper,
 the odds of having a stroke double for every ten years a person lives. 
 [Aging and ischemic stroke](https://www.ncbi.nlm.nih.gov/pmc/articles/PMC6535078/)
 
-```{r, echo=F}
+```{r, echo=F, out.height="90%", fig.cap="Boxplot of age by stroke status."}
 ggplot(main, aes(x=factor(stroke), y=age))+geom_boxplot()+ggtitle("Ages by stroke status")+
   xlab("Stroke")
 ```
+
 This shows that the older a person is, the more likely they are to have experienced a stroke.
 This would of course make sense, considering that the older someone gets, the 
 higher the chance one might encounter health issues.
+
+\newpage
 
 Another health related observation that may be relevant is that of the BMI means
 for stroke and no stroke patients. This can be visualized through a similar box plot
 as the prior one.
 
-```{r, echo=F}
+```{r, out.height="90%",echo=F, fig.cap="Boxplot of BMI by strike status."}
 ggplot(main, aes(x=factor(stroke), y=bmi))+geom_boxplot()+ggtitle("BMI by stroke status")+
   xlab("Stroke")
 ```
+
 The patients who have had a stroke only have a slightly higher BMI. The no stroke
 group also has more extreme values on both ends.
 
+\newpage
+
 ## Imbalance
 Something important which can be observed in the data is the imbalance between
-stroke instances. A barplot will be used to demonstrate this imbalance
+stroke instances. A bar plot will be used to demonstrate this imbalance
 
-```{r, echo=F}
+```{r, echo=F, fig.cap="Barplot of classifier balance."}
 ggplot(data = main) +   geom_bar(mapping = aes(x = stroke))+ ggtitle("Stroke No/Yes Comparison")
 ratio <- round(nrow(main[main$stroke == 0,]) / nrow(main), 3)
 ```
 
+
+
 As can be seen, there is a great imbalance in the amount of patients who
 have had a stroke those who have not. To be exact: `r ratio*100`% of the data,
 consists of rows where stroke is equal to 0. The remaining 5% has experienced
-a stroke. This will be very important when selecting for different machine learn
-ing algorithms, because the weighting of occurrences will most likely have to be
+a stroke. This will be very important when selecting for different machine learning
+algorithms, because the weighting of occurrences will most likely have to be
 changed in this case.
 
 \newpage
 
+## Machine Learning
+Multiple algorithms were performed, which all netted different results. A table
+will be shown with the differing algorithm metrics for them all.
+
+```{=Latex}
+\begin{table}[thb]
+\caption{\label{labelname} Weka experimenter algorithm with cost sensitive classifier results showing accuracy, false negative
+rate and the AuROC. ZeroR being the basline for which improvement or degradation is shown.}
+\footnotesize
+{\centering \begin{tabular}{lrr@{\hspace{0.1cm}}cr@{\hspace{0.1cm}}cr@{\hspace{0.1cm}}cr@{\hspace{0.1cm}}cr@{\hspace{0.1cm}}cr@{\hspace{0.1cm}}cr@{\hspace{0.1cm}}c}
+\\
+\hline
+Algorithm & ZeroR & OneR & & NaiveBayes & & SimpleLogistic & & SMO & & IBk & & J48 & & RandomForest & \\
+\hline
+\hline
+Accuracy & 65.45 & 69.92 & $\circ$ & 81.19 & $\circ$ & 79.09 & $\circ$ & 78.47 & $\circ$ & 89.85 & $\circ$ & 86.25 & $\circ$ & 91.67 & $\circ$\\
+\hline
+False  Negative Rate & 0.00 & 0.08 & $\circ$ & 0.15 & $\circ$ & 0.07 & $\circ$ & 0.06 & $\circ$ & 0.05 & $\circ$ & 0.05 & $\circ$ & 0.03 & $\circ$\\
+\hline
+AuROC & 0.50 & 0.60 & $\circ$ & 0.88 & $\circ$ & 0.90 & $\circ$ & 0.72 & $\circ$ & 0.88 & $\circ$ & 0.89 & $\circ$ & 0.98 & $\circ$\\
+\hline
+\multicolumn{16}{c}{$\circ$, $\bullet$ statistically significant improvement or degradation}\\
+\end{tabular} \footnotesize \par}
+\end{table}
+```
+
+These are the final results of the algorithm experimenter in Weka. The goal of 
+the project was to find the most accurate model, with the least amount of false
+negatves. This means that the RandomForest algorithm is the best out of all
+of the algorithms. This is also supported by the high AuROC value.
+
+## Java Program
+The finished java program can predict for multiple new instances whether a stroke
+is likely or not. The program can be executed from a .jar file. By giving the
+new instances which have yet to be classified, and the desired output file/location,
+a new file will be generated. This is an .arff file which shows the predicted
+classification for every instance/row. The program itself is built out of three 
+classes. Which are all called upon in the main class.
+
+\newpage
+
 \section{Discussion and Conclusion}
+While the final product is quite accurate, it might be possible that with
+another approach to the algorithm testing, an even better model may be trained.
+Future research on the same data set maybe prove that something was not
+considered or recognized in this project, which would lead to higher accuracy
+if adjustments are made. But until proven otherwise, the initial goal of
+creating an accurate model has been reached.
+
+## Data
 Now that the most important results have been shown, some points of contention
 could be considered. The aim of this project is to answer the original research
 question using machine learning. This may be done with varying algorithms and 
@@ -302,6 +455,24 @@ generate synthetic data points, so that the absence of balance will be remedied.
 Whether this should be remedied might also be debatable. Some may argue that the
 raw data ratio would be an accurate representation. But considering that the 
 difference is this extreme, SMOTE was chosen regardless.
+
+## Machine learning
+As mentioned before, the accuracy of the final model is quite impressive. But there
+may be room for improvement. While the settings were played with in this project,
+not every combination was tried. Although unlikely, it is possible that a novel
+combination of settings may favorably change the result. The scoring matrix may
+also be changed, since the approach in this project was slightly rudimentary.
+Further statistical testing may help find a better scoring matrix.
+
+## Medical Aplicaton
+With the rising importance of preventative care, this program can surely help
+in predicting, and therefore preventing a lot of strokes. But it is worth noting
+that only using this model is most likely not enough. While the accuracy and 
+error rate are respectively high and low, the seriousness of the condition
+warrants further examination. Individual diagnosis from doctors would most likely
+always still be a requisite, for good reason. But the program may help as reminder
+or warning sign to the people it classifies for. It might push those people to
+find further help with a doctor.
 
 \newpage
 
