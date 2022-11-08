@@ -7,7 +7,11 @@ output:
     toc: no
     toc_depth: 2
     number_sections: true
+  citecolor: red 
+  linkcolor: red
   urlcolor: blue
+bibliography: references.bib
+nocite: '@*'
 ---
 
 ```{r setup, include=FALSE}
@@ -87,8 +91,24 @@ at once.
 \newpage
 
 \section{Abbreviations}
-SMOTE : Synthetic Minority Oversampling Technique
-BMI : BOdy mass index
+
+&nbsp;
+&nbsp;
+&nbsp;
+&nbsp;
+&nbsp;
+&nbsp;
+&nbsp;
+
+| **Abbreviation** | **Word or phrase**                        |
+|------------------|-------------------------------------------|
+| SMOTE            | Synthetic Minority Oversampling Technique |
+| BMI              | Body Mass Index                           |
+| AuROC            | Area Under the ROC Curve                  |
+| ROC Curve        | Receiver Operating Characteristic Curve   |
+| SMO              | Sequential Minimal Optimization           |
+| ML               | Machine Learning                          |
+
 \newpage
 
 \section{Table of Contents}
@@ -476,8 +496,10 @@ find further help with a doctor.
 
 \newpage
 
-\section{References}
+\section{Appendices}
 
+```{r, ref.label=knitr::all_labels(),echo=F, out.height="90%", out.width="50%"}
+```
 \newpage
 
-\section{Appendices}
+\section{References}
