@@ -11,19 +11,24 @@ import weka.core.converters.ArffSaver;
 import java.io.*;
 
 public class weka {
-
+    /**
+     * Weka API handler.
+     */
     static void runWeka(String newFile, String outFile) throws Exception {
         Instances newData = readArff(newFile);
         CostSensitiveClassifier rf = new CostSensitiveClassifier();
+        // load in the proper model for classification
         rf = (CostSensitiveClassifier) SerializationHelper.read("wrapper/src/main/resources/rforest.model");
         classifyNewInstance(rf, newData, outFile);
     }
 
     private static Instances readArff(String handle) throws Exception {
+        // initiate buffered reader for .arff handling
         BufferedReader reader =
                 new BufferedReader(new FileReader(handle));
         ArffLoader.ArffReader arff = new ArffLoader.ArffReader(reader);
         Instances data = arff.getData();
+        // set classifier to last attribute (stroke)
         data.setClassIndex(data.numAttributes() - 1);
         return data;
     }
@@ -36,9 +41,12 @@ public class weka {
             double clsLabel = rf.classifyInstance(newData.instance(i));
             labeled.instance(i).setClassValue(clsLabel);
         }
+        // initiating file saver
         ArffSaver saver = new ArffSaver();
+        // preparing file saver with new predicted instances
         saver.setInstances(labeled);
         saver.setFile(new File(outFile));
+        // write output instances to new .arff file
         saver.writeBatch();
     }
 }

@@ -1,5 +1,5 @@
 ---
-title: "How accurate can a machine learning model be in predicting whether someone may expereince a stroke?"
+title: "How accurate can a machine learning model be trained in predicting whether someone may expereince a stroke?"
 author: "Orfeas Gkourlias - 420172"
 date: "`r Sys.Date()`"
 output: 
