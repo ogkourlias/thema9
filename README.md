@@ -48,6 +48,15 @@ java.exe -jar wrapper-1.0-SNAPSHOT-all.jar -f {input file path} -o {output path}
 java.exe -jar build\libs\wrapper-1.0-SNAPSHOT-all.jar -f dummy.arff -o new.arff
 ```
 
+It is also possible to download the .jar file from the releases tab. This
+will include the src code, which also contains the model which needs to be used.
+The model path is hardcoded in src, because this program only works with that
+exact model. To run it with the release version, be sure to run the .jar from the
+directory it is already in:
+```bash
+java.exe -jar wrapper.jar -f {input file path} -o {output path}
+```
+
 ## Contributing
 
 Pull requests are welcome. For major changes, please open an issue first
